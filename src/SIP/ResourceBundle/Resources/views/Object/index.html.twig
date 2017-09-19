@@ -1,0 +1,388 @@
+{% extends "SIPResourceBundle::layout.html.twig" %}       
+{% block title %}
+    {% if object.title is defined %} "{{object.name}}" {% else %} "{{object.title}}" {% endif %}
+{% endblock %}
+{% block metatags %}
+    {{ parent() }}
+    <meta name="description" content= "{{object.description}}">    
+    <meta name="keywords" content= "{{object.keywords}}">
+{% endblock %}
+{% block content %}
+    <section class="ads-main-page">
+        <div id="frend_send" class="modal hide" style="width:auto; padding:10px;">
+            <p style="text-align: center; font-weight: bold; font-size: 14px;">Отправить этот объект другу по e-mail</p>
+             <div id="frend-message"></div>
+           {{ form(frendform, {'method': 'POST', 'attr': {'class': 'frendform', 'id':'frend-form'}}) }} 
+        </div>
+        <div class="container">
+
+            <div class="span8 first">
+
+                <h2 style="font-weight:bold;">{{object.name}}</h2>
+
+                <div id="galleria">
+                    <a href="{% path object.image, 'reference' %}">
+                        <img 
+                            src="{% path object.image, 'object_map' %}" 
+                            data-big="{% path object.image, 'reference' %}"
+                            data-title="{{object.name}}"
+                            data-description="{{object.addinfo}}"
+                            >
+                    </a>
+                    {% for image in object.gallery %}
+                        <a href="{% path image.image, 'reference' %}">
+                            <img 
+                                src="{% path image.image, 'object_map' %}" 
+                                data-big="{% path image.image, 'reference' %}"
+                                data-title="{{object.name}}"
+                                data-description="{{object.addinfo}}"
+                                >
+                        </a>
+                    {% endfor %}            
+                </div>
+
+                <div id="single-page-map">
+
+                    <div id="ad-address"><span><i class="fa fa-map-marker"></i>
+                            {% if object.village %}
+                                <a href="{{ path('sip_resource_residential_estate', {'road': object.locality.road.id, 'village': object.village.id})}}">{{object.village.name}}</a>,
+                            {% endif %}
+                            <a href="{{ path('sip_resource_residential_estate', {'road': object.locality.road.id, 'locality': object.locality.id})}}">{{object.locality.name}}</a>,
+                            <a href="{{ path('sip_resource_residential_estate', {'road': object.locality.road.id})}}">{{object.locality.road.name}}</a>
+                        </span>
+                    </div>
+
+                    <div id="single-page-main-map"></div>
+
+                    <script type="text/javascript">
+                        var mapDiv,
+                                map,
+                                infobox;
+                        jQuery(document).ready(function ($) {
+
+                            mapDiv = $("#single-page-main-map");
+                            mapDiv.height(400).gmap3({
+                                map: {
+                                    options: {
+                                        "center": [{{object.coordinates}}]
+                                        , "zoom": 12
+                                        , "draggable": true
+                                        , "mapTypeControl": true
+                                        , "mapTypeId": google.maps.MapTypeId.ROADMAP
+                                        , "scrollwheel": false
+                                        , "panControl": true
+                                        , "rotateControl": false
+                                        , "scaleControl": true
+                                        , "streetViewControl": true
+                                        , "zoomControl": true
+                                    }
+                                }
+                                , marker: {
+                                    values: [
+                                        {
+                                            latLng: [{{object.coordinates}}],
+                                            options: {
+                                                icon: "{% if object.dealtype == 'sell' %} {% if object.type == 'land' %}{{ asset('bundles/sipresource/images/land.png') }}{% else %}{{ asset('bundles/sipresource/images/sale-estate.png') }}{% endif %} {% else %} {{ asset('bundles/sipresource/images/rent-estate.png') }} {% endif %}"
+                                            },
+                                            data: '<div class="marker-holder">\n\
+                                                <div class="marker-content">\n\
+                                                <div class="marker-image">\n\
+                                                <img src="{% path object.image, 'object_map' %}" />\n\
+                                                </div>\n\
+                                                <div class="marker-info-holder">\n\
+                                                <div class="marker-info">\n\
+                                                <div class="marker-info-title">{{object.name}}</div>\n\
+                                                <div class="marker-info-area">Площадь: {{object.house}} м²</div>\n\
+                                                <div class="marker-info-extra">\n\
+                                                <div class="marker-info-price">{% if object.priceFrom %}{{ object.priceFrom|number_format_duration }} {{ currency(object.currency.code) }}{% endif %}</div>\n\
+                                                <div class="marker-info-link">\n\
+                                                <a href="{{ path('sip_resource_object', {'road': object.locality.road.alias, 'locality': object.locality.alias, 'id':object.id})}}">Подробнее</a>\n\
+                                                </div>\n\
+                                                </div>\n\
+                                                </div>\n\
+                                                </div>\n\
+                                                <div class="arrow-down"></div>\n\
+                                                <div class="close"></div>\n\
+                                                </div>\n\
+                                                </div>'
+                                        }
+
+                                    ],
+                                    options: {
+                                        draggable: false
+                                    },
+                                    cluster: {
+                                        radius: 20,
+                                        // This style will be used for clusters with more than 0 markers
+                                        0: {
+                                            content: "<div class='cluster cluster-1'>CLUSTER_COUNT</div>",
+                                            width: 62,
+                                            height: 62
+                                        },
+                                        // This style will be used for clusters with more than 20 markers
+                                        20: {
+                                            content: "<div class='cluster cluster-2'>CLUSTER_COUNT</div>",
+                                            width: 82,
+                                            height: 82
+                                        },
+                                        // This style will be used for clusters with more than 50 markers
+                                        50: {
+                                            content: "<div class='cluster cluster-3'>CLUSTER_COUNT</div>",
+                                            width: 102,
+                                            height: 102
+                                        },
+                                        events: {
+                                            click: function (cluster) {
+                                                map.panTo(cluster.main.getPosition());
+                                                map.setZoom(map.getZoom() + 2);
+                                            }
+                                        }
+                                    },
+                                    events: {
+                                        click: function (marker, event, context) {
+                                            map.panTo(marker.getPosition());
+
+                                            var ibOptions = {
+                                                pixelOffset: new google.maps.Size(-125, -88),
+                                                alignBottom: true
+                                            };
+
+                                            infobox.setOptions(ibOptions)
+
+                                            infobox.setContent(context.data);
+                                            infobox.open(map, marker);
+
+                                            // if map is small
+                                            var iWidth = 260;
+                                            var iHeight = 300;
+                                            if ((mapDiv.width() / 2) < iWidth) {
+                                                var offsetX = iWidth - (mapDiv.width() / 2);
+                                                map.panBy(offsetX, 0);
+                                            }
+                                            if ((mapDiv.height() / 2) < iHeight) {
+                                                var offsetY = -(iHeight - (mapDiv.height() / 2));
+                                                map.panBy(0, offsetY);
+                                            }
+
+                                        }
+                                    }
+                                }
+                            });
+
+                            map = mapDiv.gmap3("get");
+
+                            infobox = new InfoBox({
+                                pixelOffset: new google.maps.Size(-50, -65),
+                                closeBoxURL: '',
+                                enableEventPropagation: true
+                            });
+                            mapDiv.delegate('.infoBox .close', 'click', function () {
+                                infobox.close();
+                            });
+
+                            if (Modernizr.touch) {
+                                map.setOptions({draggable: false});
+                                var draggableClass = 'inactive';
+                                var draggableTitle = "Activate map";
+                                var draggableButton = $('<div class="draggable-toggle-button ' + draggableClass + '">' + draggableTitle + '</div>').appendTo(mapDiv);
+                                draggableButton.click(function () {
+                                    if ($(this).hasClass('active')) {
+                                        $(this).removeClass('active').addClass('inactive').text("Activate map");
+                                        map.setOptions({draggable: false});
+                                    } else {
+                                        $(this).removeClass('inactive').addClass('active').text("Deactivate map");
+                                        map.setOptions({draggable: true});
+                                    }
+                                });
+                            }
+
+                        });
+                    </script>
+
+                </div>
+
+                <div id="print-detail" class="ad-detail-content">
+                    <p>{{ object.addinfo|raw }}</p>
+                </div>
+                {#
+                 <div id="print-detail" class="ad-detail-content">
+                    <span>{% if object.isForest %}{{'sip_object_isForest'|trans}}{%endif%}</span>
+                    <span>{% if object.isNearWater %}{{'sip_object_isNearWater'|trans}}{%endif%}</span>
+                    <span>{% if object.isFull %}{{'sip_object_isFull'|trans}}{%endif%}</span>
+                    <span>{% if object.isUnderFinish %}{{'sip_object_isUnderFinish'|trans}}{%endif%}</span>
+                    <span>{% if object.isFurnished %}{{'sip_object_isFurnished'|trans}}{%endif%}</span>
+                    <span>{% if object.isSecurity %}{{'sip_object_isSecurity'|trans}}{%endif%}</span>
+                </div>
+                #}
+                {% if object.layout %}
+                    <div class="ad-detail-content" style="margin-top:20px;margin-bottom:0;">
+                        <p style="margin:0;">Планировка:</p>
+                    </div>
+                    <div>
+                        <p>{{ object.layout|raw }}</p>
+                    </div>
+                {% endif %}
+                {% if object.landInfo %}
+                    <div class="ad-detail-content" style="margin-top:20px;margin-bottom:0;">
+                        <p style="margin:0;">Участок:</p>
+                    </div>
+                    <div>
+                        <p>{{ object.landInfo|raw }}</p>
+                    </div>
+                {% endif %}
+                {% if object.communication %}
+                    <div class="ad-detail-content" style="margin-top:20px;margin-bottom:0;">
+                        <p style="margin:0;">Коммуникации:</p>
+                    </div>
+
+                    <div>
+                        <p>{{ object.communication|raw }}</p>
+
+                    </div>
+                {% endif %}
+
+                {% if object.isForest or object.isNearWater or object.isFull or object.isUnderFinish or object.isFurnished or object.isSecurity or object.isHasPool or object.isUndeveloped %}
+                    <div class="ads-tags">
+                        <i class="fa fa-tag"></i>
+                        <span>
+                            {% if object.isForest %}
+                                <a>{{ 'sip_object_isForest'|trans }}</a>
+                            {% endif %}
+                            {% if object.isNearWater %}
+                                <a>{{ 'sip_object_isNearWater'|trans }}</a>
+                            {% endif %}
+                            {% if object.isFull %}
+                                <a>{{ 'sip_object_isFull'|trans }}</a>
+                            {% endif %}
+                            {% if object.isUnderFinish %}
+                                <a>{{ 'sip_object_isUnderFinish'|trans }}</a>
+                            {% endif %}
+                            {% if object.isFurnished %}
+                                <a>{{ 'sip_object_isFurnished'|trans }}</a>
+                            {% endif %}
+                            {% if object.isSecurity %}
+                                <a>{{ 'sip_object_isSecurity'|trans }}</a>
+                            {% endif %}
+                            {% if object.isHasPool %}
+                                <a>{{ 'sip_object_isHasPool'|trans }}</a>
+                            {% endif %}
+                            {% if object.isUndeveloped %}
+                                <a>{{ 'sip_object_isUndeveloped'|trans }}</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                {% endif %}
+                <ul class="links">
+                    <li>
+                        <script type="text/javascript" src="//yastatic.net/share/share.js" charset="utf-8"></script>
+                        <div class="yashare-auto-init" data-yashareL10n="ru" data-yashareType="small" data-yashareQuickServices="vkontakte,facebook,twitter,odnoklassniki,moimir" data-yashareTheme="counter"></div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="span4">
+
+                <div class="ad-detail-sidebar">
+
+                    <div class="full">
+
+                        <p class="object-link" style="margin-top:20px;">
+                        <div id="hert-favorite" style="float:left;">
+                            {% if to_favorites(object.id) %}
+                                <a href="{{path('sip_resource_ajax_unfeatured_object')}}" id="favorite-list_{{object.id}}" data-item="{{object.id}}"
+                                  data-perform-url="{{path('sip_resource_ajax_featured_object')}}" 
+                                  title="{{ 'sip_object_unfeatured_object'|trans }}" class="feature-add">
+                                    <i class="fa fa-heart-o fa-2x" id="label-favorite_{{object.id}}" 
+                                       style="color:#FFD800; margin-right:10px;" data-fav-color="rgb(255, 216, 0)" 
+                                       data-infav-colot="rgb(0, 0, 0)"></i>
+                                </a>                                
+                            {% else %}   
+                                <a href="{{path('sip_resource_ajax_featured_object')}}" id="favorite-list_{{object.id}}" data-item="{{object.id}}"
+                                   data-perform-url="{{path('sip_resource_ajax_unfeatured_object')}}" 
+                                   title="{{ 'sip_object_featured_object'|trans }}" class="feature-add">
+                                    <i class="fa fa-heart-o fa-2x" id="label-favorite_{{object.id}}" 
+                                       style="color:#000000; margin-right:10px;" data-fav-color="rgb(255, 216, 0)" 
+                                       data-infav-colot="rgb(0, 0, 0)"></i>
+                                </a>
+                            {% endif %}
+                        </div>                        
+                        </p>                        
+                            <a data-toggle="modal" href="{{ path('sip_resource_object', {'road': object.locality.road.alias, 'locality': object.locality.alias, 'id':object.id})}}" data-target="#frend_send" title="{{ 'sip_object_email'|trans }}"><i class="fa fa-envelope-o fa-2x" style="color:#000000; margin-right:10px;"></i></a>
+                            <a href="{{ path('sip_resource_object_print', {'road': object.locality.road.alias, 'locality': object.locality.alias, 'id':object.id})}}" title="{{ 'sip_object_print'|trans }}"><i class="fa fa-print fa-2x" style="color:#000000;"></i></a>
+                     </p>                        
+                        <div class="full" style="margin-bottom: 20px;">
+                            {% if object.priceFrom %}
+                                {% if object.currency.code != 'RUR'%}
+                                    <h2 style="font-weight: bold; color:#555555; margin:20px 0 0 0;">{{ object.priceFrom|number_format_duration }} {{ currency(object.currency.code) }}</h2>
+                                    <h5 style="font-weight: bold; color:#555555; margin:0 0 20px 0;">{{ object.rurValFrom|number_format_duration }} {{ currency('RUR') }}</h5>
+                                {% else %}
+                                    <h2 style="font-weight: bold; color:#555555; margin:20px 0 0 0;">{{ object.priceFrom|number_format_duration }} {{ currency('RUR') }}</i></h2>
+                                    <h5 style="font-weight: bold; color:#555555; margin:0 0 20px 0;">{{ calculateRate('USD', object.priceFrom)|number_format_duration }} {{ currency('USD') }}</h5>
+                                    <h5 style="font-weight: bold; color:#555555; margin:0 0 20px 0;">{{ calculateRate('EUR', object.priceFrom)|number_format_duration }} {{ currency('EUR') }}</h5>
+                                {% endif %}
+                            {% else %}
+                                <h5 style="font-weight: bold; color:#555555; margin:0 0 20px 0;">Цена по запросу</h5>
+                            {% endif %}
+                            <div style="font-size: 16px; color:#555555; margin:20px 0 0 0;">
+                                <p>ID: {{ object.id }}</p>
+                                                               
+                            </div>
+
+                            <div style="font-size: 14px; color:#555555; margin:20px 0 0 0;">
+                                <p>{{object.locality.road.name}} ш., {{ object.distance }} км от МКАД</p>
+                                {% if object.house %}
+                                    <p>Площадь дома: {{ object.house }} м²</p>
+                                {% endif %}
+                                <p>Площадь участка: {{ object.area }} сот. ({{ object.area/100 }} Га)</p>
+                            </div>
+
+
+                        </div>
+
+                        <div style="font-size: 14px; color:#555555; margin:20px 0 0 0; text-transform: uppercase;">
+                            <p>Оставьте заявку,</p>                                
+                            <p>мы вас проконсультируем</p>                                                                                   
+                        </div>    
+                        <div id="contact-ad-owner-v2">
+                            <div id="contact-message"></div>
+                            {{ form(form, {'method': 'POST', 'attr': {'class': 'contactform', 'id':'contact-form'}}) }}
+                        </div>
+                    </div>
+
+                    <div style="font-size: 18px; color:#555555; margin:20px 0 0 0; text-align: center; text-transform: uppercase;">
+                        <p>Похожие предложения</p>                                                                                  
+                    </div>        
+
+
+                    {% for similar in similars %}
+                        {% if loop.index is divisibleby(2) %}                        
+                            <div class="span2" style="margin-left:10px;">                        
+                            {% else %}
+                                <div class="span4" style="margin-left:0;">    
+                                    <div class="span2" style="margin-left:0;">    
+                                    {% endif %}
+                                    <div>
+                                        <a href="{{ path('sip_resource_object', {'road': similar.locality.road.alias, 'locality': similar.locality.alias, 'id':similar.id})}}">
+                                            {% thumbnail similar.image, 'object_map' %}
+                                        </a>
+                                    </div>
+                                    <div style = "margin:10px 0">
+                                        <a href="{{ path('sip_resource_object', {'road': similar.locality.road.alias, 'locality': similar.locality.alias, 'id':similar.id})}}">{{similar.name}}</a>
+                                    </div>
+                                    <div style = "margin:0 0 10px 0">
+                                        {% if similar.priceFrom %}
+                                            {{ similar.priceFrom|number_format_duration }} {{ currency(similar.currency.code) }}
+                                        {% else %}
+                                            Цена по запросу
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if loop.index is divisibleby(2) %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+    </section>
+{% endblock %}

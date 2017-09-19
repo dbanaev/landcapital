@@ -1,0 +1,15 @@
+parameters:
+    search.sphinxsearch.indexer.class: SIP\SearchBundle\Services\Indexer\Indexer
+    search.sphinxsearch.search.class: SIP\SearchBundle\Services\Search\SphinxSearch
+services:
+    search.sphinxsearch.indexer:
+        class: %search.sphinxsearch.indexer.class%
+        arguments: [%search.sphinxsearch.indexer.bin%, %search.sphinxsearch.indexes%]
+
+    search.sphinxsearch.search:
+        class: %search.sphinxsearch.search.class%
+        arguments:
+            - %search.sphinxsearch.searchd.host%
+            - %search.sphinxsearch.searchd.port%
+            - %search.sphinxsearch.searchd.socket%
+            - %search.sphinxsearch.indexes%

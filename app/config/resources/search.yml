@@ -1,0 +1,17 @@
+sip_search:
+    searchd:
+        host:   %sphinxsearch_host%
+        port:   %sphinxsearch_port%
+
+    indexes:
+        customerIndex:
+            customerIndex: ~
+        providerIndex:
+            providerIndex: ~
+        nomenclatureIndex:
+            nomenclatureIndex: ~
+        orderIndex:
+            orderIndex: ~
+        documentIndex:
+            documentIndex: ~
+         

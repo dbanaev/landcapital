@@ -1,0 +1,24 @@
+<div class="marker-holder">
+    <div class="marker-content">
+        <div class="marker-image">
+            {%  if data.image %}<img src="{% path data.image, 'object_map' %}"/>{%  endif %}
+        </div>
+        <div class="marker-info-holder">
+            <div class="marker-info">
+                <div class="marker-info-title">{{data.name}}</div>
+                <div class="marker-info-extra">
+                    {% if data.house %}
+                        <div class="marker-info-price">Площадь: {{ data.house }} м².</div>
+                    {% endif %}
+                    {% if data.priceFrom %}
+                        <div class="marker-info-price">{{ data.priceFrom|number_format_duration }} {{ currency(data.currency.code) }}</div>
+                    {% endif %}
+                    <div class="marker-info-link"><a target="_blank" href="{{ path('sip_resource_object', {'road': data.locality.road.alias, 'locality': data.locality.alias, 'id': data.id}) }}">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="arrow-down"></div>
+        <div class="close"></div>
+    </div>
+</div>

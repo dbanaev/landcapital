@@ -1,0 +1,43 @@
+<section id="categories-homepage">
+    <div class="container">
+        <h3>Коттеджные поселки</h3>
+        <div class="full">
+            {% for data in roadObjects %}
+                {% for block, items in data %}
+            {% if loop.index == 1 %}        
+            <div class="category-box span3 first">
+            {% else %}
+                <div class="category-box span3">
+               {% endif %}
+                <div class="category-header">
+                    <span class="category-icon">
+                        <div class="category-icon-box" style="background-color: #9c59b6;"><i class="fa fa-home"></i></div>
+                    </span>
+                    {% set roadId = 0 %}
+                    {% for vill in items %}
+                        {% set roadId = vill.id %}
+                    {% endfor %}
+                    <span class="cat-title"><a href="{{ path('sip_resource_residential_estate', {'road': roadId})}}"><h4>{{block}}</h4></a></span>
+                </div>
+
+                <div class="category-content">
+                    <ul>
+                        {% for vill in items %}
+                            <li>
+                                <a href="{{ path('sip_resource_residential_estate', {'road': roadId, 'locality': vill.l_id})}}" title='Смотреть подробнее "{{vill.l_name}}"'>
+                                    {{vill.l_name}}</a>
+                                <span class="category-counter">{{vill.l_count}}</span>
+                            </li>
+                        
+                        {% endfor %}
+                        <li>
+                            <a href="{{ path('sip_resource_residential_estate', {'road': roadId})}}">Посмотреть все →</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            {% endfor %} 
+            {% endfor %} 
+        </div>
+    </div>
+</section>

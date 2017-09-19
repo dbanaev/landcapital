@@ -1,0 +1,9 @@
+{% extends "SIPResourceBundle::layout.html.twig" %}
+{% block content %}
+    <div class="container">
+        <h3>{{ selection.name }}</h3>
+        <div id="list-objects-insert">
+            {% include 'SIPResourceBundle:Realestate:list_objects.html.twig' %}
+        </div>
+    </div>
+{% endblock %}

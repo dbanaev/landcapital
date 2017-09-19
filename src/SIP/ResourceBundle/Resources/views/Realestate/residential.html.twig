@@ -1,0 +1,476 @@
+{% extends "SIPResourceBundle::layout.html.twig" %}
+
+{% block metatags %}
+    {% if params.metadata %}
+        <title>{{ params.metadata.title }}</title>
+        <meta name="description" content= "{{ params.metadata.description }}">
+        <meta name="keywords" content= "{{ params.metadata.keywords }}">
+    {% else %}
+        <title>{% block title %}Land Capital - Элитая недвижимость Подмосковья{% endblock %}</title>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <section id="big-map" style="opacity: 1;">
+
+        <div id="flatads-main-map" style="height: 500px; position: relative; overflow: hidden; transform: translateZ(0px);
+             background-color: rgb(229, 227, 223);">
+        </div>
+        {% set routeParams = app.request.query.all %}
+        {% set routeParams = app.request.query.all|merge({'dealType': params.selectedDealType}) %}
+        {% set mapUrl = path('sip_resource_ajax_map_object', routeParams) %}
+        <script type="text/javascript">
+            var mapDiv, map, infobox;
+            jQuery(document).ready(function ($) {
+                $.ajax({
+                    url: '{{ mapUrl|raw }}',
+                    success: function (response) {
+                        mapDiv = $("#flatads-main-map");
+                        mapDiv.height(500).gmap3({
+                            map: {
+                                options: {
+                                    "draggable": true
+                                    , "mapTypeControl": true
+                                    , "mapTypeId": google.maps.MapTypeId.ROADMAP
+                                    , "scrollwheel": false
+                                    , "panControl": true
+                                    , "rotateControl": false
+                                    , "scaleControl": true
+                                    , "streetViewControl": true
+                                    , "zoomControl": true
+                                    , "center": [55.74114,36.897034]
+                                }
+                            },
+                            marker: {
+                                values: response,
+                                options: {
+                                    draggable: false
+                                },
+                                cluster: {
+                                    radius: 20,
+                                    // This style will be used for clusters with more than 0 markers
+                                    0: {
+                                        content: "<div class='cluster cluster-1'>CLUSTER_COUNT</div>",
+                                        width: 62,
+                                        height: 62
+                                    },
+                                    // This style will be used for clusters with more than 20 markers
+                                    20: {
+                                        content: "<div class='cluster cluster-2'>CLUSTER_COUNT</div>",
+                                        width: 82,
+                                        height: 82
+                                    },
+                                    // This style will be used for clusters with more than 50 markers
+                                    50: {
+                                        content: "<div class='cluster cluster-3'>CLUSTER_COUNT</div>",
+                                        width: 102,
+                                        height: 102
+                                    },
+                                    events: {
+                                        click: function (cluster) {
+                                            map.panTo(cluster.main.getPosition());
+                                            map.setZoom(map.getZoom() + 2);
+                                        }
+                                    }
+                                },
+                                events: {
+                                    click: function (marker, event, context) {
+                                        map.panTo(marker.getPosition());
+                                        var ibOptions = {
+                                            pixelOffset: new google.maps.Size(-125, -50),
+                                            alignBottom: true
+                                        };
+                                        infobox.setOptions(ibOptions);
+
+                                        infobox.setContent(context.data);
+                                        infobox.open(map, marker);
+                                        // if map is small
+                                        var iWidth = 260;
+                                        var iHeight = 300;
+                                        if ((mapDiv.width() / 2) < iWidth) {
+                                            var offsetX = iWidth - (mapDiv.width() / 2);
+                                            map.panBy(offsetX, 0);
+                                        }
+                                        if ((mapDiv.height() / 2) < iHeight) {
+                                            var offsetY = -(iHeight - (mapDiv.height() / 2));
+                                            map.panBy(0, offsetY);
+                                        }
+
+                                    }
+                                }
+                            }
+                        }, "autofit");
+
+                        map = mapDiv.gmap3("get");
+                        infobox = new InfoBox({
+                            pixelOffset: new google.maps.Size(-50, -65),
+                            closeBoxURL: '',
+                            enableEventPropagation: true
+                        });
+                        mapDiv.delegate('.infoBox .close', 'click', function () {
+                            infobox.close();
+                        });
+                        if (Modernizr.touch) {
+                            map.setOptions({draggable: false});
+                            var draggableClass = 'inactive';
+                            var draggableTitle = "Activate map";
+                            var draggableButton = $('<div class="draggable-toggle-button ' + draggableClass + '">' + draggableTitle + '</div>')
+                                    .appendTo(mapDiv);
+                            draggableButton.click(function () {
+                                if ($(this).hasClass('active')) {
+                                    $(this).removeClass('active').addClass('inactive').text("Activate map");
+                                    map.setOptions({draggable: false});
+                                } else {
+                                    $(this).removeClass('inactive').addClass('active').text("Deactivate map");
+                                    map.setOptions({draggable: true});
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        </script>
+
+        <div id="advanced-search-widget-version2">
+        <div class="container">
+        <form method="get" name = "search_map" id="views-exposed-form-search-view-other-ads-page" accept-charset="UTF-8" action="{{ path('sip_resource_residential_estate') }}" data-ajax-serach-action="{{path('sip_ajax_object_search')}}">
+            <input type="hidden" name="dealType" value="{{ params.selectedDealType }}">
+            <input type="hidden" name="route" value="sip_resource_residential_estate">
+            <div class="advanced-search-widget-content-2 clearfix">
+                <div class="form-cell chosen-v2 ">
+                    <select id="search-field-road" name="road" class="form-select" style="display: none;">
+                        <option value="0" {% if request %}{% else %}selected="selected"{%endif%}>Шоссе</option>
+                        {% for road in roads %}
+                            <option value="{{road.id}}" {% if request.road| default('') ==road.id %}selected="selected" {%endif%}>{{road.name}}</option>
+                        {% endfor %}
+                        <option value=""></option>
+                    </select>
+                </div>
+
+                <div class="form-cell chosen-v2 ">
+                    <select id="search-field-locatity" name="locality" class="form-select" style="display: none;" data-ajax-link="{{ path('sip_ajax_locality_road') }}" data-request-id="{% if request and request.locality is defined %} {{ request.locality }} {% endif %} ">
+                        <option value="" {% if request.locality| default('') == '' %}selected="selected"{%endif%}>Населенный пункт</option>
+                    </select>
+                </div>
+
+                <div class="form-cell chosen-v2 ">
+                    <select id="search-field-type" name="type" class="form-select" style="display: none;">
+                        <option value="" selected="selected">Тип</option>
+                        {% for key, type in types %}
+                            <option value="{{key}}" {% if request.type| default('') == key %}selected="selected" {%endif%}>{{type}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-cell chosen-v2 ">
+                    <select id="geo-radius" name="mkad_distance" class="form-select" style="display: none;">
+                        <option value="" selected="selected">Удаленность</option>
+                        <option value="10" {% if request and request.mkad_distance is defined and request.mkad_distance == 10 %}selected="selected"{% endif %}>10 км</option>
+                        <option value="20" {% if request and request.mkad_distance is defined and request.mkad_distance == 20 %}selected="selected"{% endif %}>20 км</option>
+                        <option value="30" {% if request and request.mkad_distance is defined and request.mkad_distance == 30 %}selected="selected"{% endif %}>30 км</option>
+                        <option value="40" {% if request and request.mkad_distance is defined and request.mkad_distance == 40 %}selected="selected"{% endif %}>40 км</option>
+                        <option value="50" {% if request and request.mkad_distance is defined and request.mkad_distance == 50 %}selected="selected"{% endif %}>50 км</option>
+                        <option value="60" {% if request and request.mkad_distance is defined and request.mkad_distance == 60 %}selected="selected"{% endif %}>60 км</option>
+                        <option value="70" {% if request and request.mkad_distance is defined and request.mkad_distance == 70 %}selected="selected"{% endif %}>70 км</option>
+                        <option value="80" {% if request and request.mkad_distance is defined and request.mkad_distance == 80 %}selected="selected"{% endif %}>80 км</option>
+                        <option value="90" {% if request and request.mkad_distance is defined and request.mkad_distance == 90 %}selected="selected"{% endif %}>90 км</option>
+                        <option value="100" {% if request and request.mkad_distance is defined and request.mkad_distance == 100 %}selected="selected"{% endif %}>100 км</option>
+                        <option value="110" {% if request and request.mkad_distance is defined and request.mkad_distance == 110 %}selected="selected"{% endif %}>110 км</option>
+                        <option value="120" {% if request and request.mkad_distance is defined and request.mkad_distance == 120 %}selected="selected"{% endif %}>120 км</option>
+                        <option value="130" {% if request and request.mkad_distance is defined and request.mkad_distance == 130 %}selected="selected"{% endif %}>130 км</option>
+                        <option value="140" {% if request and request.mkad_distance is defined and request.mkad_distance == 140 %}selected="selected"{% endif %}>140 км</option>
+                        <option value="150" {% if request and request.mkad_distance is defined and request.mkad_distance == 150 %}selected="selected"{% endif %}>150+ км</option>
+                    </select>
+                </div>
+
+                <div class="form-cell chosen-container-range chosen-v2 ">
+                    <div class="chzn-range-btn">
+                        <span class="chzn-range-btn-text">{% if request and request.min_house is defined and request.max_house is defined and request.min_house > 0 and request.max_house > 0 %}{{ request.min_house }}м² - {{ request.max_house }}м²{% else %}Площадь дома{% endif %}</span>
+                        <i class="fa fa-angle-down"></i>
+
+                        <select name="min_house" id="min_house" class="form-range-select chosen-container-start" style="display: none;">
+                            <option value="0" selected="selected">0 м²</option>
+                            <option value="100" {% if request and request.min_house is defined and request.min_house == 100 %}selected="selected"{% endif %}>100 м²</option>
+                            <option value="200" {% if request and request.min_house is defined and request.min_house == 200 %}selected="selected"{% endif %}>200 м²</option>
+                            <option value="300" {% if request and request.min_house is defined and request.min_house == 300 %}selected="selected"{% endif %}>300 м²</option>
+                            <option value="400" {% if request and request.min_house is defined and request.min_house == 400 %}selected="selected"{% endif %}>400 м²</option>
+                            <option value="500" {% if request and request.min_house is defined and request.min_house == 500 %}selected="selected"{% endif %}>500 м²</option>
+                            <option value="600" {% if request and request.min_house is defined and request.min_house == 600 %}selected="selected"{% endif %}>600 м²</option>
+                            <option value="700" {% if request and request.min_house is defined and request.min_house == 700 %}selected="selected"{% endif %}>700 м²</option>
+                            <option value="800" {% if request and request.min_house is defined and request.min_house == 800 %}selected="selected"{% endif %}>800 м²</option>
+                            <option value="900" {% if request and request.min_house is defined and request.min_house == 900 %}selected="selected"{% endif %}>900 м²</option>
+                            <option value="1000" {% if request and request.min_house is defined and request.min_house == 1000 %}selected="selected"{% endif %}>1000 м²</option>
+                            <option value="1500" {% if request and request.min_house is defined and request.min_house == 1500 %}selected="selected"{% endif %}>1500 м²</option>
+                            <option value="2000" {% if request and request.min_house is defined and request.min_house == 2000 %}selected="selected"{% endif %}>2000 м²</option>
+                            <option value="2500" {% if request and request.min_house is defined and request.min_house == 2500 %}selected="selected"{% endif %}>2500 м²</option>
+                            <option value="3000" {% if request and request.min_house is defined and request.min_house == 3000 %}selected="selected"{% endif %}>3000+ м²</option>
+                        </select>
+                        <select name="max_house" id="max_house" class="form-range-select chosen-container-end" style="display: none;">
+                            <option value="0" selected="selected">0 м²</option>
+                            <option value="100" {% if request and request.max_house is defined and request.max_house == 100 %}selected="selected"{% endif %}>100 м²</option>
+                            <option value="200" {% if request and request.max_house is defined and request.max_house == 200 %}selected="selected"{% endif %}>200 м²</option>
+                            <option value="300" {% if request and request.max_house is defined and request.max_house == 300 %}selected="selected"{% endif %}>300 м²</option>
+                            <option value="400" {% if request and request.max_house is defined and request.max_house == 400 %}selected="selected"{% endif %}>400 м²</option>
+                            <option value="500" {% if request and request.max_house is defined and request.max_house == 500 %}selected="selected"{% endif %}>500 м²</option>
+                            <option value="600" {% if request and request.max_house is defined and request.max_house == 600 %}selected="selected"{% endif %}>600 м²</option>
+                            <option value="700" {% if request and request.max_house is defined and request.max_house == 700 %}selected="selected"{% endif %}>700 м²</option>
+                            <option value="800" {% if request and request.max_house is defined and request.max_house == 800 %}selected="selected"{% endif %}>800 м²</option>
+                            <option value="900" {% if request and request.max_house is defined and request.max_house == 900 %}selected="selected"{% endif %}>900 м²</option>
+                            <option value="1000" {% if request and request.max_house is defined and request.max_house == 1000 %}selected="selected"{% endif %}>1000 м²</option>
+                            <option value="1500" {% if request and request.max_house is defined and request.max_house == 1500 %}selected="selected"{% endif %}>1500 м²</option>
+                            <option value="2000" {% if request and request.max_house is defined and request.max_house == 2000 %}selected="selected"{% endif %}>2000 м²</option>
+                            <option value="2500" {% if request and request.max_house is defined and request.max_house == 2500 %}selected="selected"{% endif %}>2500 м²</option>
+                            <option value="3000" {% if request and request.max_house is defined and request.max_house == 3000 %}selected="selected"{% endif %}>3000+ м²</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-cell chosen-container-range chosen-v2 ">
+                    <div class="chzn-range-btn">
+                        <span class="chzn-range-btn-text">{% if request and request.min_area is defined and request.max_area is defined and request.min_area > 0 and request.max_area > 0 %}{{ request.min_area }}сот - {{ request.max_area }}сот{% else %}Площадь участка{% endif %}</span>
+                        <i class="fa fa-angle-down"></i>
+
+                        <select name="min_area" id="min_area" class="form-range-select chosen-container-start" style="display: none;">
+                            <option value="0" selected="selected">0 сот</option>
+                            <option value="10" {% if request and request.min_area is defined and request.min_area == 10 %}selected="selected"{% endif %}>10 сот</option>
+                            <option value="20" {% if request and request.min_area is defined and request.min_area == 20 %}selected="selected"{% endif %}>20 сот</option>
+                            <option value="30" {% if request and request.min_area is defined and request.min_area == 30 %}selected="selected"{% endif %}>30 сот</option>
+                            <option value="40" {% if request and request.min_area is defined and request.min_area == 40 %}selected="selected"{% endif %}>40 сот</option>
+                            <option value="50" {% if request and request.min_area is defined and request.min_area == 50 %}selected="selected"{% endif %}>50 сот</option>
+                            <option value="60" {% if request and request.min_area is defined and request.min_area == 60 %}selected="selected"{% endif %}>60 сот</option>
+                            <option value="70" {% if request and request.min_area is defined and request.min_area == 70 %}selected="selected"{% endif %}>70 сот</option>
+                            <option value="80" {% if request and request.min_area is defined and request.min_area == 80 %}selected="selected"{% endif %}>80 сот</option>
+                            <option value="90" {% if request and request.min_area is defined and request.min_area == 90 %}selected="selected"{% endif %}>90 сот</option>
+                            <option value="100" {% if request and request.min_area is defined and request.min_area == 100 %}selected="selected"{% endif %}>100 сот</option>
+                            <option value="150" {% if request and request.min_area is defined and request.min_area == 150 %}selected="selected"{% endif %}>150 сот</option>
+                            <option value="200" {% if request and request.min_area is defined and request.min_area == 200 %}selected="selected"{% endif %}>200 сот</option>
+                            <option value="250" {% if request and request.min_area is defined and request.min_area == 250 %}selected="selected"{% endif %}>250 сот</option>
+                            <option value="300" {% if request and request.min_area is defined and request.min_area == 300 %}selected="selected"{% endif %}>300+ сот</option>
+                        </select>
+                        <select name="max_area" id="max_area" class="form-range-select chosen-container-end" style="display: none;">
+                            <option value="0" selected="selected">0 сот</option>
+                            <option value="10" {% if request and request.max_area is defined and request.max_area == 10 %}selected="selected"{% endif %}>10 сот</option>
+                            <option value="20" {% if request and request.max_area is defined and request.max_area == 20 %}selected="selected"{% endif %}>20 сот</option>
+                            <option value="30" {% if request and request.max_area is defined and request.max_area == 30 %}selected="selected"{% endif %}>30 сот</option>
+                            <option value="40" {% if request and request.max_area is defined and request.max_area == 40 %}selected="selected"{% endif %}>40 сот</option>
+                            <option value="50" {% if request and request.max_area is defined and request.max_area == 50 %}selected="selected"{% endif %}>50 сот</option>
+                            <option value="60" {% if request and request.max_area is defined and request.max_area == 60 %}selected="selected"{% endif %}>60 сот</option>
+                            <option value="70" {% if request and request.max_area is defined and request.max_area == 70 %}selected="selected"{% endif %}>70 сот</option>
+                            <option value="80" {% if request and request.max_area is defined and request.max_area == 80 %}selected="selected"{% endif %}>80 сот</option>
+                            <option value="90" {% if request and request.max_area is defined and request.max_area == 90 %}selected="selected"{% endif %}>90 сот</option>
+                            <option value="100" {% if request and request.max_area is defined and request.max_area == 100 %}selected="selected"{% endif %}>100 сот</option>
+                            <option value="150" {% if request and request.max_area is defined and request.max_area == 150 %}selected="selected"{% endif %}>150 сот</option>
+                            <option value="200" {% if request and request.max_area is defined and request.max_area == 200 %}selected="selected"{% endif %}>200 сот</option>
+                            <option value="250" {% if request and request.max_area is defined and request.max_area == 250 %}selected="selected"{% endif %}>250 сот</option>
+                            <option value="300" {% if request and request.max_area is defined and request.max_area == 300 %}selected="selected"{% endif %}>300+ сот</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-cell chosen-container-range chosen-v2 ">
+                    <div class="chzn-range-btn">
+                        <span class="chzn-range-btn-text">{% if request and request.price_min is defined and request.price_max is defined and request.price_min > 0 and request.price_max > 0 %}{{ request.price_min }} млн$ - {{ request.price_max }} млн${% else %}Цена{% endif %}</span>
+                        <i class="fa fa-angle-down"></i>
+
+                        <select name="price_min" id="price_min" class="form-range-select chosen-container-start" style="display: none;">
+                            <option value="0" selected="selected">0 млн$</option>
+                            <option value="0.5" {% if request and request.price_min is defined and request.price_min == 0.5 %}selected="selected"{% endif %}>0.5 млн$</option>
+                            <option value="1" {% if request and request.price_min is defined and request.price_min == 1 %}selected="selected"{% endif %}>1 млн$</option>
+                            <option value="1.5" {% if request and request.price_min is defined and request.price_min == 1.5 %}selected="selected"{% endif %}>1.5 млн$</option>
+                            <option value="2" {% if request and request.price_min is defined and request.price_min == 2 %}selected="selected"{% endif %}>2 млн$</option>
+                            <option value="2.5" {% if request and request.price_min is defined and request.price_min == 2.5 %}selected="selected"{% endif %}>2.5 млн$</option>
+                            <option value="3" {% if request and request.price_min is defined and request.price_min == 3 %}selected="selected"{% endif %}>3 млн$</option>
+                            <option value="3.5" {% if request and request.price_min is defined and request.price_min == 3.5 %}selected="selected"{% endif %}>3.5 млн$</option>
+                            <option value="4" {% if request and request.price_min is defined and request.price_min == 4 %}selected="selected"{% endif %}>4 млн$</option>
+                            <option value="4.5" {% if request and request.price_min is defined and request.price_min == 4.5 %}selected="selected"{% endif %}>4.5 млн$</option>
+                            <option value="5" {% if request and request.price_min is defined and request.price_min == 5 %}selected="selected"{% endif %}>5 млн$</option>
+                            <option value="5.5" {% if request and request.price_min is defined and request.price_min == 5.5 %}selected="selected"{% endif %}>5.5 млн$</option>
+                            <option value="6" {% if request and request.price_min is defined and request.price_min == 6 %}selected="selected"{% endif %}>6 млн$</option>
+                            <option value="6.5" {% if request and request.price_min is defined and request.price_min == 6.5 %}selected="selected"{% endif %}>6.5 млн$</option>
+                            <option value="7" {% if request and request.price_min is defined and request.price_min == 7 %}selected="selected"{% endif %}>7 млн$</option>
+                            <option value="7.5" {% if request and request.price_min is defined and request.price_min == 7.5 %}selected="selected"{% endif %}>7.5 млн$</option>
+                            <option value="8" {% if request and request.price_min is defined and request.price_min == 8 %}selected="selected"{% endif %}>8 млн$</option>
+                            <option value="8.5" {% if request and request.price_min is defined and request.price_min == 8.5 %}selected="selected"{% endif %}>8.5 млн$</option>
+                            <option value="9" {% if request and request.price_min is defined and request.price_min == 9 %}selected="selected"{% endif %}>9 млн$</option>
+                            <option value="9.5" {% if request and request.price_min is defined and request.price_min == 9.5 %}selected="selected"{% endif %}>9.5 млн$</option>
+                            <option value="10" {% if request and request.price_min is defined and request.price_min == 10 %}selected="selected"{% endif %}>10+ млн$</option>
+                        </select>
+                        <select name="price_max" id="price_max" class="form-range-select chosen-container-end" style="display: none;">
+                            <option value="0" selected="selected">0 млн$</option>
+                            <option value="0.5" {% if request and request.price_max is defined and request.price_max == 0.5 %}selected="selected"{% endif %}>0.5 млн$</option>
+                            <option value="1" {% if request and request.price_max is defined and request.price_max == 1 %}selected="selected"{% endif %}>1 млн$</option>
+                            <option value="1.5" {% if request and request.price_max is defined and request.price_max == 1.5 %}selected="selected"{% endif %}>1.5 млн$</option>
+                            <option value="2" {% if request and request.price_max is defined and request.price_max == 2 %}selected="selected"{% endif %}>2 млн$</option>
+                            <option value="2.5" {% if request and request.price_max is defined and request.price_max == 2.5 %}selected="selected"{% endif %}>2.5 млн$</option>
+                            <option value="3" {% if request and request.price_max is defined and request.price_max == 3 %}selected="selected"{% endif %}>3 млн$</option>
+                            <option value="3.5" {% if request and request.price_max is defined and request.price_max == 3.5 %}selected="selected"{% endif %}>3.5 млн$</option>
+                            <option value="4" {% if request and request.price_max is defined and request.price_max == 4 %}selected="selected"{% endif %}>4 млн$</option>
+                            <option value="4.5" {% if request and request.price_max is defined and request.price_max == 4.5 %}selected="selected"{% endif %}>4.5 млн$</option>
+                            <option value="5" {% if request and request.price_max is defined and request.price_max == 5 %}selected="selected"{% endif %}>5 млн$</option>
+                            <option value="5.5" {% if request and request.price_max is defined and request.price_max == 5.5 %}selected="selected"{% endif %}>5.5 млн$</option>
+                            <option value="6" {% if request and request.price_max is defined and request.price_max == 6 %}selected="selected"{% endif %}>6 млн$</option>
+                            <option value="6.5" {% if request and request.price_max is defined and request.price_max == 6.5 %}selected="selected"{% endif %}>6.5 млн$</option>
+                            <option value="7" {% if request and request.price_max is defined and request.price_max == 7 %}selected="selected"{% endif %}>7 млн$</option>
+                            <option value="7.5" {% if request and request.price_max is defined and request.price_max == 7.5 %}selected="selected"{% endif %}>7.5 млн$</option>
+                            <option value="8" {% if request and request.price_max is defined and request.price_max == 8 %}selected="selected"{% endif %}>8 млн$</option>
+                            <option value="8.5" {% if request and request.price_max is defined and request.price_max == 8.5 %}selected="selected"{% endif %}>8.5 млн$</option>
+                            <option value="9" {% if request and request.price_max is defined and request.price_max == 9 %}selected="selected"{% endif %}>9 млн$</option>
+                            <option value="9.5" {% if request and request.price_max is defined and request.price_max == 9.5 %}selected="selected"{% endif %}>9.5 млн$</option>
+                            <option value="10" {% if request and request.price_max is defined and request.price_max == 10 %}selected="selected"{% endif %}>10+ млн$</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-cell chosen-container-range chosen-v2 ">
+                    <button class="filter_submit" name="" value="Search" type="submit">Поиск...</button>
+                </div>
+
+            </div>
+
+            <div class="check-filter-row clearfix">
+                <div class="check-filter-item">
+                    <label class="check-emul">
+                        <input class="hidden-check" id="isSecurity" name="isSecurity" type="checkbox"/>
+                        <i class='fa fa-check'></i>
+                        <span class="check-emul-text">Охрана</span></label>
+                </div>
+                <div class="check-filter-item">
+                    <label class="check-emul">
+                        <input class="hidden-check" id="isHasPool" name="isHasPool" type="checkbox"/>
+                        <i class='fa fa-check'></i>
+                        <span class="check-emul-text">Бассейн</span></label>
+                </div>
+                <div class="check-filter-item">
+                    <label class="check-emul">
+                        <input class="hidden-check" id="isFull" name="isFull" type="checkbox"/>
+                        <i class='fa fa-check'></i>
+                        <span class="check-emul-text">Под ключ</span></label>
+                </div>
+                <div class="check-filter-item">
+                    <label class="check-emul">
+                        <input class="hidden-check" id="isUnderFinish" name="isUnderFinish" type="checkbox"/>
+                        <i class='fa fa-check'></i>
+                        <span class="check-emul-text">Под отделку</span></label>
+                </div>
+
+            </div>
+
+            <div class="check-filter-row clearfix">
+                <div class="check-filter-item">
+                    <label class="check-emul">
+                        <input class="hidden-check" id="isFurnished" name="isFurnished" type="checkbox"/>
+                        <i class='fa fa-check'></i>
+                        <span class="check-emul-text">С мебелью </span></label>
+                </div>
+                <div class="check-filter-item">
+                    <label class="check-emul">
+                        <input class="hidden-check" id="isUndeveloped" name="isUndeveloped" type="checkbox"/>
+                        <i class='fa fa-check'></i>
+                        <span class="check-emul-text">Недостроен</span></label>
+                </div>
+
+                <div class="filter-reset"><a href="{{ path('sip_resource_residential_estate') }}">Сбросить все фильтры...</a></div>
+
+            </div>
+        </form>
+
+        <script>
+            jQuery(document).ready(function($){
+                var touched = false;
+
+                function hideDropDowns(){
+                    $('.chzn-range-btn').removeClass('open_select select_done');
+                    $('.form-range-select').trigger('chosen:close');
+                    $('.form-select').trigger('chosen:close');
+                }
+
+                jQuery(".form-range-select").chosen()
+                        .on('chosen:showing_dropdown', function(evt, params){
+
+                        })
+                        .on('chosen:hiding_dropdown', function(evt, params){
+                            var firedEl = $(evt.currentTarget), chznBtn = firedEl.closest('.chzn-range-btn');
+
+                            firedEl.trigger('chosen:updated');
+
+                            if(chznBtn.hasClass('select_done')){
+
+                                var chzn1 = chznBtn.find('.chosen-container').eq(0).find('.result-selected').html(),
+                                        chzn2 = chznBtn.find('.chosen-container').eq(1).find('.result-selected').html();
+
+                                if(chzn1 !== void 0 && chzn2 !== void 0) chznBtn.addClass('range_selected').find('.chzn-range-btn-text').text(chzn1 + ' - ' + chzn2);
+
+                                chznBtn.removeClass('open_select select_done')
+                                        .find('.form-range-select')
+                                        .trigger('chosen:close')
+                                ;
+                            }
+
+                        });
+
+                jQuery('.chzn-range-btn').on('click', function(e){
+                    var firedEl = $(this);
+
+                    hideDropDowns();
+
+                    if($(e.target).hasClass('result-selected')){
+
+                        var chznBtn = firedEl.closest('.chzn-range-btn');
+
+                        var chzn1 = chznBtn.find('.chosen-container').eq(0).find('.result-selected').html(),
+                                chzn2 = chznBtn.find('.chosen-container').eq(1).find('.result-selected').html();
+
+                        if(chzn1 !== void 0 && chzn2 !== void 0) chznBtn.addClass('range_selected').find('.chzn-range-btn-text').text(chzn1 + ' - ' + chzn2);
+                    }
+
+                    if(!firedEl.hasClass('open_select') && !$(e.target).hasClass('result-selected')){
+
+                        firedEl.addClass('open_select').find('.form-range-select').each(function(ind){
+                            $(this).trigger('chosen:open');
+                        });
+
+                    }
+                    return false;
+                });
+
+                $(document).click(function(e){
+                    if($(e.target).parents().filter('.chzn-range-btn').length != 1){
+                        hideDropDowns();
+                    }
+                });
+
+                $('body').delegate('.chzn-range-btn .chosen-results li', 'mousedown', function(){
+
+                    var firedEl = $(this), chzn = firedEl.closest('.chosen-container').prev();
+
+                    firedEl.addClass('result-selected').siblings().removeClass('result-selected');
+
+                    if(chzn.hasClass('chosen-container-end')){
+                        firedEl.closest('.chzn-range-btn').addClass('select_done');
+                        chzn.trigger('chosen:close');
+                    }
+                });
+                if($('.form-range-select').length > 0){
+                    $('.form-range-select').on('touchstart', function(e){
+                        e.stopPropagation();
+                        e.preventDefault();
+                        // Trigger the mousedown event.
+                        if(!touched){
+                            touched = true;
+                            $(this).trigger('mousedown');
+                        }
+                    }).on('touchend', function(e){
+                        e.stopPropagation();
+                        e.preventDefault();
+                        // Trigger the mousedown event.
+                        touched = false;
+                    });
+                }
+            });
+        </script>
+        </div>
+        </div>
+    </section>
+    <div class="filter-clear-fix"></div>
+    <div id="list-objects-insert">
+        {% include 'SIPResourceBundle:Realestate:list_objects.html.twig' %}
+    </div>
+   
+{% endblock %}

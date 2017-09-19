@@ -1,0 +1,158 @@
+{% extends "SIPResourceBundle::layout.html.twig" %}       
+
+{% block metatags %}
+    {% set meta = get_meta_data('contacts') %}
+    {% if meta %}
+        {% if meta.metaTitle %}<title>{{ meta.metaTitle }}</title>{% endif %}
+        {% if meta.metaKeywords %}<meta content="{{ meta.metaKeywords }}" name="keywords">{% endif %}
+        {% if meta.metaDescription %}<meta content="{{ meta.metaDescription }}" name="description">{% endif %}
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <section id="big-map" style="opacity: 1; background:#ffffff;">
+
+        <div id="flatads-main-map"></div>
+		<script type="text/javascript">
+		var mapDiv,
+			map,
+			infobox;
+		jQuery(document).ready(function($) {
+
+			mapDiv = $("#flatads-main-map");
+			mapDiv.height(500).gmap3({
+				map: {
+					options: {
+						"center":[55.760723, 37.242105]
+      					,"zoom": 12						,"draggable": true
+						,"mapTypeControl": true
+						,"mapTypeId": google.maps.MapTypeId.ROADMAP
+						,"scrollwheel": false
+						,"panControl": true
+						,"rotateControl": false
+						,"scaleControl": true
+						,"streetViewControl": true
+						,"zoomControl": true
+						,"styles": [
+    {
+        "featureType": "landscape.natural",
+        "elementType": "geometry.fill",
+        "stylers": [
+            {
+                "visibility": "on"
+            },
+            {
+                "color": "#e0efef"
+            }
+        ]
+    },
+    {
+        "featureType": "poi",
+        "elementType": "geometry.fill",
+        "stylers": [
+            {
+                "visibility": "on"
+            },
+            {
+                "hue": "#1900ff"
+            },
+            {
+                "color": "#c0e8e8"
+            }
+        ]
+    },
+    {
+        "featureType": "landscape.man_made",
+        "elementType": "geometry.fill"
+    },
+    {
+        "featureType": "road",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "lightness": 100
+            },
+            {
+                "visibility": "simplified"
+            }
+        ]
+    },
+    {
+        "featureType": "road",
+        "elementType": "labels",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "featureType": "water",
+        "stylers": [
+            {
+                "color": "#7dcdcd"
+            }
+        ]
+    },
+    {
+        "featureType": "transit.line",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "visibility": "on"
+            },
+            {
+                "lightness": 700
+            }
+        ]
+    }
+] 					}
+				}
+				,marker: {
+					latLng: [55.760723, 37.242105]
+				}
+			});
+
+			map = mapDiv.gmap3("get");
+
+		    if (Modernizr.touch){
+		    	map.setOptions({ draggable : false });
+		        var draggableClass = 'inactive';
+		        var draggableTitle = "Activate map";
+		        var draggableButton = $('<div class="draggable-toggle-button '+draggableClass+'">'+draggableTitle+'</div>').appendTo(mapDiv);
+		        draggableButton.click(function () {
+		        	if($(this).hasClass('active')){
+		        		$(this).removeClass('active').addClass('inactive').text("Activate map");
+		        		map.setOptions({ draggable : false });
+		        	} else {
+		        		$(this).removeClass('inactive').addClass('active').text("Deactivate map");
+		        		map.setOptions({ draggable : true });
+		        	}
+		        });
+		    }
+
+		});
+		</script>
+                <div class="container">
+                {% if content %}   
+                {% for data in content %}
+                    {{data.value|raw}}
+                {% endfor %}    
+                   {% else %}
+                       <h3 class="contact">
+                           <p style="text-align: center;">Тел.: +7 (495) 999-3-999
+                               <br> 
+                               <a href="mailto:info@9993999.ru" class="contact">email: info@9993999.ru</a> 
+                               <a href="http://9993999.ru" class="contact">www.9993999.ru</a>
+                           </p>
+                       </h3> 
+                       <h2 class="contact">
+                           <p style="text-align: center;">&nbsp;&nbsp; &nbsp;143421, Московская область, Красногорский район, с. Ильинское</p>
+                       </h2>
+                {% endif %}
+                </div>    
+	</section>
+
+{% endblock %}

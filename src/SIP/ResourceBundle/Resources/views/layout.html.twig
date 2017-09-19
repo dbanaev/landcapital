@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!--[if IE 7]>
+<html class="ie ie7" lang="ru-RU">
+<![endif]-->
+<!--[if IE 8]>
+<html class="ie ie8" lang="ru-RU">
+<![endif]-->
+<!--[if !(IE 7) | !(IE 8)  ]><!-->
+<html lang="ru-RU">
+    <!--<![endif]-->
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <meta http-equiv="X-UA-Compatible" content="IE=9" />
+        {% block metatags %}
+            <title>{% block title %}Land Capital - Элитая недвижимость Подмосковья{% endblock %}</title>
+        {% endblock %}
+        {% block stylesheets %}
+            {% stylesheets output='assets/compiled/layout.css'
+            'http://fonts.googleapis.com/css?family=Armata&#038;ver=4.0.7'
+            'http://fonts.googleapis.com/css?family=Oxygen:700'
+            '@SIPResourceBundle/Resources/public/fonts/genericons.css'
+            '@SIPResourceBundle/Resources/public/css/style.css'
+            '@SIPResourceBundle/Resources/public/css/bootstrap.css'
+            '//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css?ver=4.1.0'
+            '@SIPResourceBundle/Resources/public/css/chosen.min.css'
+            '@SIPResourceBundle/Resources/public/css/flexslider.css'
+            '@SIPResourceBundle/Resources/public/css/custom.css'
+            '@SIPResourceBundle/Resources/public/css/filter.css'
+            '@SIPResourceBundle/Resources/public/css/bootstrap-responsive.css'
+            '@SIPResourceBundle/Resources/public/js/galleria.classic.css'
+            filter='cssrewrite' 
+        %}
+            <link href="{{ asset_url }}" rel="stylesheet" />            
+            {% endstylesheets %}
+            <!--[if lt IE 9]>
+            <link rel='stylesheet' id='FlatAds-ie-css'  href="{{ asset('bundles/sipresource/css/ie.css') }}?v1.0" type='text/css' media='all' />
+            <![endif]-->
+        {% endblock %}
+        {% block headjs %}
+            {% javascripts output='assets/compiled/layout_head.js'
+            '@SIPResourceBundle/Resources/public/js/jquery.js'
+            '@SIPResourceBundle/Resources/public/js/jquery-migrate.min.js'
+            %}
+            <script type="text/javascript" src="{{ asset_url }}"></script>
+            {% endjavascripts %}
+            <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&ver=2013-07-18&language=ru"></script>
+
+        {% endblock %}
+        {% block icons %}
+            <link rel="icon" href="{{ asset('bundles/sipresource/img/favicon.ico') }}?v1.0" type="image/x-icon">
+        {% endblock %}
+    </head>
+
+    <body  class="page page-id-2340 page-template page-template-template-homepage-v2 page-template-template-homepage-v2-php logged-in admin-bar no-customize-support single-author">
+        {% include 'SIPResourceBundle::header.html.twig' %}
+        {% block flashBag %}
+            {% include 'SIPResourceBundle::flashbag.html.twig' %}
+        {% endblock %}
+        {% block menu %}
+            <header id="navbar">
+                <div class="container">
+                    <a class="logo pull-left" href="{{ path('sip_resource_main') }}" title="Home">
+                        <img src="{{ asset('bundles/sipresource/img/logo.png') }}" height="30px" alt="Logo" />
+                    </a>
+                    <div id="version-two-menu" class="main_menu">
+                        {{ knp_menu_render('SIPResourceBundle:Builder:mainMenu', {'currentClass': 'active'}) }}
+                    </div>
+                     <div class="main_menu" style="float:right;">
+                         {% if get_setting('phone') %}
+                            <a href="tel:{{get_setting('phone').name}}" style="font-family: Oxygen, Arial; font-size: 30px; font-weight: bolder;">
+                                {% if get_setting('phone').value%}{{get_setting('phone').value|raw}}{%else%}<span style="font-size:0.7em">+7 /495/</span> 999-3-999{%endif%}
+                            </a>
+                         {% endif %}
+                    </div>
+                </div>
+            </header>
+        {% endblock %}
+
+        {% block content %}
+        {% endblock %}
+
+        {% block footer %}
+            {% include 'SIPResourceBundle::footer.html.twig' %}
+        {% endblock %}
+
+        {% block bodyjs %}           
+            {% javascripts output='assets/compiled/layout_bodу.js'
+            '@SIPResourceBundle/Resources/public/js/jquery-ui.js'
+            '@SIPResourceBundle/Resources/public/js/jquery.tools.min.js'
+            '@SIPResourceBundle/Resources/public/js/jquery.ui.touch-punch.min.js'
+            '@SIPResourceBundle/Resources/public/js/jquery.isotope.min.js'
+            '@SIPResourceBundle/Resources/public/js/jquery.tools.min.js'
+            '@SIPResourceBundle/Resources/public/js/jquery.flexslider.js'
+            '@SIPResourceBundle/Resources/public/js/jquery.carouFredSel-6.2.1-packed.js'
+            '@SIPResourceBundle/Resources/public/js/modernizr.touch.js'
+            '@SIPResourceBundle/Resources/public/js/bootstrap.min.js'
+            '@SIPResourceBundle/Resources/public/js/chosen.jquery.min_.js'
+            '@SIPResourceBundle/Resources/public/js/gmap3.infobox.js'
+            '@SIPResourceBundle/Resources/public/js/gmap3.min.js'
+            '@SIPResourceBundle/Resources/public/js/galleria-1.3.5.min.js'
+            '@SIPResourceBundle/Resources/public/js/galleria.classic.min.js'
+            '@SIPResourceBundle/Resources/public/js/functions.js'
+            '@SIPResourceBundle/Resources/public/js/menu.js'
+            '@SIPResourceBundle/Resources/public/js/custom.js'
+            %}
+            <script type="text/javascript" src="{{ asset_url }}"></script>           
+            {% endjavascripts %}
+        {% endblock %}
+    </body>
+</html>

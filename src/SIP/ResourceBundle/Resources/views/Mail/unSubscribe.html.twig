@@ -1,0 +1,12 @@
+{% extends 'SIPResourceBundle::layout.html.twig' %}
+{% block content %}
+    <div class="container main-container headerOffset">
+        <div class="row">
+            {% if success is defined %}
+                <h3>Email {{ email }} успешно удален из списка рассылок</h3>
+            {% else %}
+                <h3>Ошибка при удалении {{ email }}!</h3>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

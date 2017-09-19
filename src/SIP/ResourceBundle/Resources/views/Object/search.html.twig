@@ -1,0 +1,46 @@
+<section id="ads-homepage">
+    <div class="container">
+        <div class="pane latest-ads-holder" >
+
+            <div class="latest-ads-grid-holder">
+                {% if favorites %}
+                    {% set count = 1 %}
+                    {% for object  in favorites %}
+                        {% if loop.index == 1 or loop.index == count %}
+                            {% set count = count + 4 %}
+                            <div class="ad-box span3 latest-posts-grid first">
+                            {% else %}                                    
+                                <div class="ad-box span3 latest-posts-grid">    
+                                {% endif %}  
+                                <a class="ad-image" href="{{ path('sip_resource_main', {'id':object.id})}}">
+
+                                    <img class="add-box-main-image" src="{% path object.image, 'object_map' %}">
+                                    <img class="add-box-second-image" src="{% path object.secondImage, 'object_map' %}">
+                                </a>
+
+                                <div class="ad-box-content">
+
+                                    <span class="ad-category">                            
+                                        {% if object.dealtype == 'sell' %}
+                                            <div class="category-icon-box" style="background-color: #7ba48a;"><i class="fa {{ get_icon_by_type(object.type) }}"></i></div>
+                                            {% endif %}
+                                            {% if object.dealtype == 'rent' %}
+                                            <div class="category-icon-box" style="background-color: #9c59b6;"><i class="fa {{ get_icon_by_type(object.type) }}"></i></div>
+                                            {% endif %}                              
+                                    </span>
+
+                                    <a href="{{ path('sip_resource_main', {'id':object.id})}}">{{object.name}}</a>
+                                    {% if object.priceFrom %}
+                                        <div class="add-price"><span>{{ object.priceFrom|number_format_duration }} {{ currency(object.currency.code) }}</span></div>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <h1>Вы пока ничего не выбрали</h1>
+                    {% endif %}                    
+                </div>
+            </div>
+        </div>
+</section>

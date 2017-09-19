@@ -1,0 +1,3 @@
+_sip_search:
+    resource: "@SIPSearchBundle/Controller/SearchController.php"
+    type:     annotation

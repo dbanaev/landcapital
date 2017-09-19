@@ -1,0 +1,17 @@
+<section id="top-menu-block">
+    <div class="container">
+        <section id="register-login-block-top">
+            <h4 style="float:left; margin: 5px 0;">Элитная недвижимость Подмосковья</h4>
+            {% include 'SIPSearchBundle:Search:search-form.html.twig' %}
+        </section>        
+        <div class="top-social-icons">
+            <a href="{{path('sip_resource_object_favorites')}}">
+                Избранное
+                <span class="label label-default" style="margin-right: 20px;" id="fetured_count">{{get_favorites()}}</span>
+            </a>
+            <a class="target-blank" href="https://www.facebook.com/land.capital"><i class="fa fa-facebook-square"></i></a>
+            <a class="target-blank" href="https://twitter.com/9993999ru"><i class="fa fa-twitter-square"></i></a>
+            <a class="target-blank" href="https://instagram.com/9993999.ru"><i class="fa fa-instagram"></i></a>
+        </div>
+    </div>
+</section>

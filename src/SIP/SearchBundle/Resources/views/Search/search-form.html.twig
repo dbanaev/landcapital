@@ -1,0 +1,10 @@
+{% block search %}
+    <form class="sidebar-form" action="{{ path('sip_search_result') }}" role="search" style="float:left; margin-left:50px; height:30px;">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" id="f-cloud-search" placeholder="{{ 'sip_search_placeholder'|trans }}" style="width: 100%;">
+            <span class="input-group-btn">
+                <button type="submit" id="search-btn" class="btn btn-flat" style="float:right; border:none; background:none; margin:0 auto; position: relative; bottom: 40px; right: -10px;"><i class="fa fa-search"></i></button>
+            </span>
+        </div>
+    </form>    
+{% endblock %}

@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD DHTML 4.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml">
+<head>
+<title>{% if object.title is defined %} "{{object.name}}" {% else %} "{{object.title}}" {% endif %}</title>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta name="description" content= "{{object.description}}">    
+<meta name="keywords" content= "{{object.keywords}}">
+<link rel="icon" href="{{ asset('bundles/sipresource/img/favicon.ico') }}?v1.0" type="image/x-icon">
+<style>
+    @media print {
+        #print_logo {
+            display:none;
+        }
+    }
+</style>
+</head>
+<body style="background:#ffffff">
+    <div style="position:absolute;top:5px;right:5px" id='print_logo'>
+        <a href='#'><img title="Распечатать" src="{{ asset('bundles/sipresource/images/print.png', absolute=true) }}" onClick="window.print();
+                return false;" /></a>
+    </div>
+    <div id="content" style="float:left;width:720px;">
+        <div style="text-align:center;"><img src="{{ asset('bundles/sipresource/img/logo.png', absolute=true) }}" border=0 width=300></div>
+        <div  style="margin:15px 0;"><hr width=95%></div>
+        <div style="text-align:center;">
+            <h3>{{object.name}}
+            </h3>
+            Объект {{object.id}}<br>
+                {{object.DealType|trans}} <br>
+
+        </div>
+        <div  style="padding:5px 0 0 0;font-size:14px;text-align:center">
+            {% if object.priceFrom %}
+                {% if object.currency.code != 'RUR'%}
+                    <b>{{ object.priceFrom|number_format_duration }} {{ currency(object.currency.code) }}</b> |
+                    <b>{{ object.rurValFrom|number_format_duration }} {{ currency('RUR') }}</b>
+                {% else %}
+                    <b>{{ object.priceFrom|number_format_duration }} {{ currency('RUR') }}</b> |
+                    <b>{{ calculateRate('USD', object.priceFrom)|number_format_duration }} {{ currency('USD') }}</b> |
+                    <b>{{ calculateRate('EUR', object.priceFrom)|number_format_duration }} {{ currency('EUR') }}</b>
+                {% endif %}
+            {% else %}
+                <b>Цена по запросу</b>
+            {% endif %}
+
+        </div>
+        <br>
+        <div style="margin:0 0 0 10px">
+
+            <div style="width:340px;float:right;margin: 0 0 0 10px;">
+                <div style="font-size:14px;">
+                    {{object.locality.name}}<br>			
+                    {{object.locality.road.name}} шоссе, {{object.distance}} км от МКАД<br>
+
+                    Общая площадь дома - {{object.house}} м<sup>2</sup><br>
+                    Площадь участка - {{object.area}} соток<br>
+                </div>
+                <div  style="padding:5px 0 0 0;border-top:1px solid #888888;font-size:14px;">&nbsp;&nbsp;&nbsp;&nbsp;
+                    {{object.addinfo|raw}}
+                </div>
+                <div  style="padding:5px 0 0 0;border-top:1px solid #888888;font-size:14px;">&nbsp;&nbsp;&nbsp;&nbsp;
+                    {{object.layout|raw}}
+                </div>
+
+                {% if object.communication %}
+                    <div  style="padding:5px 0 0 0;border-top:1px solid #888888;font-size:14px;">&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{object.communication|raw}}
+                    </div>
+                {% endif %}
+
+                {% if object.printInfo %}
+                    <div  style="padding:5px 0 0 0;border-top:1px solid #888888;font-size:14px;">&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{ object.printInfo|raw }}
+                    </div>
+                {% endif %}
+            </div>
+            {% for image in object.gallery %}
+                {% if loop.index < 4 %}
+                    <img 
+                    src="{{ app.request.getSchemeAndHttpHost() }}{% path image.image, 'object_map' %}"
+                    data-title="{{object.name}}"
+                    data-description="{{object.addinfo}}" />
+                {%endif%}
+            {% endfor %}
+        </div>		
+
+        <div style="float:left;width:720px;">
+
+            <div style="margin:0;"><hr width=95%></div>
+            <div style="margin:0 0 0 10px;text-align:center">© {{ 'now'|date('Y') }}
+            {% if get_setting('firm_name').value %}{{get_setting('firm_name').value}}{% else %}Land Capital{% endif %}<br>
+                телефон: <b>{% if get_setting('phone').name %}{{get_setting('phone').name}}{% else %}+7 (495) 999-3-999{% endif %}</b><br>
+                e-mail: {% if get_setting('mail').value %}{% else %}info@9993999.ru{% endif %}</div>
+
+        </div>
+
+    </div>
+</body>
+</html>            

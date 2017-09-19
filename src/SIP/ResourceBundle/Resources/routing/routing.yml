@@ -1,0 +1,27 @@
+_sip_main:
+    resource: "@SIPResourceBundle/Controller/MainController.php"
+    type:     annotation
+
+_sip_ajax:
+    resource: "@SIPResourceBundle/Controller/AjaxController.php"
+    type:     annotation
+    
+_sip_object:
+    resource: "@SIPResourceBundle/Controller/ObjectController.php"
+    type:     annotation
+
+_sip_realestate:
+    resource: "@SIPResourceBundle/Controller/RealestateController.php"
+    type:     annotation
+    
+_sip_mail:
+    resource: "@SIPResourceBundle/Controller/MailController.php"
+    type:     annotation
+
+_sip_sitemap:
+    resource: "@SIPResourceBundle/Controller/SitemapController.php"
+    type:     annotation
+
+_sip_selection:
+    resource: "@SIPResourceBundle/Controller/SelectionController.php"
+    type:     annotation

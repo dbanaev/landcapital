@@ -1,0 +1,124 @@
+sip_resource_residential_estate: Продажа
+sip_resource_rent: Аренда
+sip_resource_about: О компании
+sip_resource_contacts: Контакты
+Action: Дествия
+
+Setting List: Список настроек
+sip_setting_name: Название
+sip_setting_code: Код
+sip_setting_value: Значение
+Setting: Настройки
+General: Основные
+Gallery: Галерея
+sip_image: Изображение
+sip_position: Позиция
+
+Object List: Список объектов недвижимости
+Object: Объекты недвижимости
+sip_object_name: Название
+sip_object_priceFrom: Стоимость от
+sip_object_priceTo: Стоимость до
+sip_object_image: Изображение
+sip_object_gallery: Галерея
+sip_object_currency: Валюта
+sip_object_galleryMultiple: Загрузить изображения в галлерею
+sip_object_locality: Населенный пункт
+sip_object_village: Поселок
+sip_object_coordinates: Координаты
+sip_object_distance: Удаление
+sip_object_house: Дом (м2)
+sip_object_area: Участок (сот.)
+sip_object_addInfo: Дополнительная информация
+sip_object_landInfo: Информация по земле
+sip_object_layout: Планировка
+sip_object_communication: Коммуникации
+sip_object_printInfo: Информация для печати
+sip_object_type: Тип объекта
+sip_object_dealType: Тип сделки
+sip_object_estateType: Тип недвижимости
+sip_object_selection: Подборки
+sip_object_publish: Публикация
+Publish: Публикация
+
+Price: Цены
+Additionally: Дополнительные
+Position: Расположение
+Currency: Валюты
+Currency List: Список валют
+sip_currency_name: Название
+sip_currency_code: Код
+sip_currency_ratio: Курс к рублю
+sip_currency_updated: Дата обновления
+
+Selection: Подборки
+Selection List: Спиоск подборок
+sip_selection_name: Название
+sip_selection_alias: Название(англ)
+
+Village: Поселки
+Village List: Список поселков
+sip_village_locality: Населенный пункт
+sip_village_name: Название
+sip_village_alias: Название(англ)
+sip_village_text: Описание
+sip_village_coordinates: Координаты
+
+Locality: Населенные пункты
+Locality List: Список населенных пунктов
+sip_locality_road: Шоссе
+sip_locality_alias: Название(англ)
+sip_locality_name: Название
+sip_locality_text: Описание
+sip_locality_coordinates:  Координаты
+sip_locality_distance: Удаление
+
+Road: Шоссе
+Road List: Список шоссе
+sip_road_name: Название
+sip_road_alias: Название(англ)
+sip_road_text: Описание
+
+sip_seo_title: Title
+sip_seo_description: Description
+sip_seo_keywords: Keywords
+
+Bid: Заявки
+Bid List: Список заявок
+sip_bid_name: Имя
+sip_bid_email: Email
+sip_bid_phone: Телефон
+sip_bid_text: Сообщение
+sip_bid_created: Создана
+sip_bid_object: Объект
+
+sell: Продажа
+rent: Аренда
+Subscriber: Подписчики
+Subscriber List: Список подписчиков
+sip_mail_subscriber_email: Email
+sip_mail_subscriber_date: Дата подписки
+
+sip_object_unfeatured_object: Удалить из избранного
+sip_object_featured_object: Добавить в избранное
+sip_object_email: Отправить этот объект другу по e-mail
+sip_object_print: Версия для печати
+sip_frend_created: Дата
+sip_frend_email: Email
+sip_frend_subject: Тема
+sip_frend_text: Текст
+Frend: Письма другу
+sip_search_placeholder: Поиск
+
+Options: Опции
+sip_object_isForest: Лесной
+sip_object_isNearWater: У воды
+sip_object_isFull: Под ключ
+sip_object_isUnderFinish: Под отделку
+sip_object_isSecurity: Охрана
+sip_object_isFurnished: С мебелью
+sip_object_isHasPool: С бассейном
+sip_object_isUndeveloped: Недостроен
+
+MetaData: Мета данные
+Meta Data List: Список мета-данных

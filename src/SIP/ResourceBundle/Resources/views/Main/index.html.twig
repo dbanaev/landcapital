@@ -1,0 +1,218 @@
+{% extends "SIPResourceBundle::layout.html.twig" %}
+{% block metatags %}
+    {% set meta = get_meta_data('main') %}
+    {% if meta %}
+        {% if meta.metaTitle %}<title>{{ meta.metaTitle }}</title>{% endif %}
+        {% if meta.metaKeywords %}<meta content="{{ meta.metaKeywords }}" name="keywords">{% endif %}
+        {% if meta.metaDescription %}<meta content="{{ meta.metaDescription }}" name="description">{% endif %}
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <section id="big-map" style="opacity: 1;">
+
+        <div id="flatads-main-map" data-map-ajax-link="{{ path('sip_resource_ajax_map_object') }}">
+        </div>   
+        <script type="text/javascript">
+            var mapDiv, map, infobox;
+            jQuery(document).ready(function ($) {
+                $.ajax({
+                    url: '{{ path('sip_resource_ajax_map_object') }}',
+                    success: function (response) {
+                        mapDiv = $("#flatads-main-map");
+                        mapDiv.height(500).gmap3({
+                            map: {
+                                options: {
+                                    "draggable": true
+                                    , "mapTypeControl": true
+                                    , "mapTypeId": google.maps.MapTypeId.ROADMAP
+                                    , "scrollwheel": false
+                                    , "panControl": true
+                                    , "rotateControl": false
+                                    , "scaleControl": true
+                                    , "streetViewControl": true
+                                    , "zoomControl": true
+                                    , zoomControlOptions: {
+                                        position: google.maps.ControlPosition.RIGHT_CENTER
+                                    }
+                                    , streetViewControlOptions: {
+                                        position: google.maps.ControlPosition.RIGHT_TOP
+                                    }
+                                    , "center": [55.74114,36.897034]
+                                }
+                            },
+                            marker: {
+                                values: response,
+                                options: {
+                                    draggable: false
+                                },
+                                cluster: {
+                                    radius: 20,
+                                    // This style will be used for clusters with more than 0 markers
+                                    0: {
+                                        content: "<div class='cluster cluster-1'>CLUSTER_COUNT</div>",
+                                        width: 62,
+                                        height: 62
+                                    },
+                                    // This style will be used for clusters with more than 20 markers
+                                    20: {
+                                        content: "<div class='cluster cluster-2'>CLUSTER_COUNT</div>",
+                                        width: 82,
+                                        height: 82
+                                    },
+                                    // This style will be used for clusters with more than 50 markers
+                                    50: {
+                                        content: "<div class='cluster cluster-3'>CLUSTER_COUNT</div>",
+                                        width: 102,
+                                        height: 102
+                                    },
+                                    events: {
+                                        click: function (cluster) {
+                                            map.panTo(cluster.main.getPosition());
+                                            map.setZoom(map.getZoom() + 2);
+                                        }
+                                    }
+                                },
+                                events: {
+                                    click: function (marker, event, context) {
+                                        map.panTo(marker.getPosition());
+                                        var ibOptions = {
+                                            pixelOffset: new google.maps.Size(-125, -50),
+                                            alignBottom: true
+                                        };
+                                        infobox.setOptions(ibOptions)
+
+                                        infobox.setContent(context.data);
+                                        infobox.open(map, marker);
+                                        // if map is small
+                                        var iWidth = 260;
+                                        var iHeight = 300;
+                                        if ((mapDiv.width() / 2) < iWidth) {
+                                            var offsetX = iWidth - (mapDiv.width() / 2);
+                                            map.panBy(offsetX, 0);
+                                        }
+                                        if ((mapDiv.height() / 2) < iHeight) {
+                                            var offsetY = -(iHeight - (mapDiv.height() / 2));
+                                            map.panBy(0, offsetY);
+                                        }
+
+                                    }
+                                }
+                            }
+                        }, "autofit");
+
+                        map = mapDiv.gmap3("get");
+                        infobox = new InfoBox({
+                            pixelOffset: new google.maps.Size(-50, -65),
+                            closeBoxURL: '',
+                            enableEventPropagation: true
+                        });
+                        mapDiv.delegate('.infoBox .close', 'click', function () {
+                            infobox.close();
+                        });
+                        map.addListener('zoom_changed', function () {                            
+                            infobox.close();
+                        });
+                        if (Modernizr.touch) {
+                            map.setOptions({draggable: false});
+                            var draggableClass = 'inactive';
+                            var draggableTitle = "Activate map";
+                            var draggableButton = $('<div class="draggable-toggle-button ' + draggableClass + '">' + draggableTitle + '</div>')
+                                    .appendTo(mapDiv);
+                            draggableButton.click(function () {
+                                if ($(this).hasClass('active')) {
+                                    $(this).removeClass('active').addClass('inactive').text("Activate map");
+                                    map.setOptions({draggable: false});
+                                } else {
+                                    $(this).removeClass('inactive').addClass('active').text("Deactivate map");
+                                    map.setOptions({draggable: true});
+                                }
+                            });
+                        }
+
+                        jQuery("#advance-search-slider").slider({
+                            range: "min",
+                            value: {{default_distance}},
+                            min: {{distance.min_distance}},
+                            max: {{distance.max_distance}},
+                            slide: function (event, ui) {
+                                jQuery( "#geo-radius" ).val( ui.value );
+                            }                                    
+                        });
+                    }
+                });
+            });
+        </script>
+
+        <div id="advanced-search-widget-version2" class=" home">
+            <div class="container">
+                <div class="advanced-search-widget-content">
+                    <form method="get" name = "search_map" id="views-exposed-form-search-view-other-ads-page" accept-charset="UTF-8" action="{{ path('sip_resource_residential_estate') }}" data-ajax-serach-action="{{path('sip_ajax_object_search')}}">
+                        <div id="edit-search-api-views-fulltext-wrapper" class="views-exposed-widget views-widget-filter-search_api_views_fulltext">
+                            <div class="views-widget">
+                                <div class="control-group form-type-textfield form-item-search-api-views-fulltext form-item">
+                                    <div class="controls"> 
+                                        <input placeholder="Название" type="text" id="edit-search-api-views-fulltext" name="object_name" value="" size="30" maxlength="128" class="form-text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="edit-ad-location-wrapper" class="views-exposed-widget views-widget-filter-field_ad_location">
+                            <div class="views-widget">
+                                <div class="control-group form-type-select form-item-ad-location form-item">
+                                    <div class="controls"> 
+                                        <select id="search-field-road" name="road" class="form-select" style="display: none;">
+                                            <option value="0" selected="selected">Шоссе</option>
+                                             {% for road in roads %}
+                                                 <option value="{{road.id}}" >{{road.name}}</option>
+                                             {% endfor %}
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="views-exposed-widget views-widget-filter-field_category">
+                            <div class="views-widget">
+                                <div class="control-group form-type-select form-item-field-category form-item">
+                                    <div class="controls">
+                                        <select id="search-field-locatity" name="locality" class="form-select" style="display: none;" data-ajax-link="{{ path('sip_ajax_locality_road') }}">
+                                            <option value="">Населенный пункт</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="home-search-slider">
+                           
+                            <div id="advance-search-slider" class="value-slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false">
+                                
+                            <a id="slid-cursor" class="ui-slider-handle ui-state-default ui-corner-all" href="#">
+				<span class="range-pin">
+                                    <input type="text" name="mkad_distance" id="geo-radius" value="{{default_distance}}" data-default-value="{{default_distance}}">
+				</span>
+                            </a>
+                            </div>
+                        </div>                        
+                        <div class="views-exposed-widget views-submit-button">
+                            <button class="btn btn-primary form-submit" id="edit-submit-search-view" name="" value="Search" type="submit">Поиск</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% include 'SIPResourceBundle:Main:slider.html.twig' %}                                    
+{% include 'SIPResourceBundle:Main:road.html.twig' %}
+{% include 'SIPResourceBundle:Main:selection.html.twig' %}
+{% endblock %}
+
+{% block footer %}
+    {% set textMain = get_setting('seo_text_main') %}
+    {% if textMain %}
+        {{ get_setting('seo_text_main').value|raw }}
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}

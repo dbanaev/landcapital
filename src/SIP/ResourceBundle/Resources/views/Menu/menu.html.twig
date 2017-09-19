@@ -1,0 +1,18 @@
+{% extends 'knp_menu.html.twig' %}
+
+{% block label %}
+    {% if item.getExtra('image_path') %}
+        <img src="{{ asset(item.getExtra('image_path')) }}" width="30" alt="">
+    {% endif %}
+    {{ item.label|trans(item.getExtra('translation_params', {}), item.getExtra('translation_domain', 'messages')) }}
+{% endblock %}
+
+{% block item %}
+    {% if item.getExtra('profile') %}
+        <li {% if item.getExtra('class') %}class="{{ item.getExtra('class') }}"{% endif %} >
+            <a href="{{ path('_sip_login') }}">{{ 'login'|trans }}</a>
+        </li>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "SIPResourceBundle::layout.html.twig" %}       
+
+{% block metatags %}
+    {% set meta = get_meta_data('about') %}
+    {% if meta %}
+        {% if meta.metaTitle %}<title>{{ meta.metaTitle }}</title>{% endif %}
+        {% if meta.metaKeywords %}<meta content="{{ meta.metaKeywords }}" name="keywords">{% endif %}
+        {% if meta.metaDescription %}<meta content="{{ meta.metaDescription }}" name="description">{% endif %}
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<section id="big-map" style="opacity: 1; background:#ffffff;">
+ <div class="container">        
+        {%for data in content%}
+            <table id="offers">
+                <tr>
+                    <td style="">
+                        {% if data %}
+                        {{data.value|raw}}
+                        {% else %}
+                        <p style="text-align:justify;">Компания <b>Land Capital Real Estate</b> основана в 1997 году и является одним из ведущих игроков на рынке недвижимости. Компания занимается продажей городской, загородной, коммерческой и зарубежной недвижимости любых категорий и готова предложить своим клиентам полный комплекс услуг по приобретению и продаже недвижимости. Многолетний успешный опыт работы в данном сегменте создал компании Land Capital репутацию надежного партнера. В базе компании всегда есть большое количество уникальных предложений по объектам недвижимости и земельным участкам, отвечающим запросам самых взыскательных клиентов. Land Capital имеет представительства в России, Германии, Испании и на Кипре. Работу компании Land Capital отличает высокий уровень надежности и конфиденциальности, благодаря чему многие частные банки в России и Швейцарии рекомендуют консультантов Land Capital своим клиентам. Большое количество клиентов компании, однажды обратившись в Land Capital, в дальнейшем доверяют только нам решение всех вопросов, связанных с покупкой и продажей недвижимости, земельных участков, подбором и оценкой объектов недвижимости для инвестирования средств.</p> <div style="text-align:center;"> <img src="/bundles/sipresource/img/belka.jpg" title="" alt="" width="292" height="400"> </div>
+                        {% endif %}    
+                    </td>
+                </tr>
+            </table>	
+        {% endfor %}
+    </div>  
+</section>
+{% endblock %}

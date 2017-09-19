@@ -1,0 +1,76 @@
+{% extends "SIPResourceBundle::layout.html.twig" %}       
+
+{% block content %}
+    <section id="ads-homepage">
+        <div class="container">
+            <div class="pane latest-ads-holder" >
+
+                <div class="latest-ads-grid-holder">
+                    {% if favorites %}
+                        {% set count = 1 %}
+                        {% for object  in favorites %}
+                            {% if loop.index == 1 or loop.index == count %}
+                                    {% set count = count + 4 %}
+                                <div class="ad-box span3 latest-posts-grid first">
+                                {% else %}                                    
+                                    <div class="ad-box span3 latest-posts-grid">    
+                                    {% endif %}  
+                                    <a class="ad-image" href="{{ path('sip_resource_object', {'road': object.locality.road.alias, 'locality': object.locality.alias, 'id':object.id}) }}">
+
+                                        <img class="add-box-main-image" src="{% path object.image, 'object_map' %}">
+                                        <img class="add-box-second-image" src="{% path object.secondImage, 'object_map' %}">
+                                    </a>
+
+                                    <div class="ad-box-content">
+
+                                        <span class="ad-category">                            
+                                            {% if object.dealtype == 'sell' %}
+                                                <div class="category-icon-box" style="background-color: #7ba48a;"><i class="fa {{ get_icon_by_type(object.type) }}"></i></div>
+                                                {% endif %}
+                                                {% if object.dealtype == 'rent' %}
+                                                <div class="category-icon-box" style="background-color: #9c59b6;"><i class="fa {{ get_icon_by_type(object.type) }}"></i></div>
+                                                {% endif %}                              
+                                        </span>
+
+                                        <a href="{{ path('sip_resource_object', {'road': object.locality.road.alias, 'locality': object.locality.alias, 'id':object.id})}}">{{object.name}}</a>
+                                        {% if object.priceFrom %}
+                                            <div class="add-price" style="margin-bottom:10px;"><span>{{ object.priceFrom|number_format_duration }} {{ currency(object.currency.code) }}</span></div>
+                                        {% else %}
+                                            <div class="add-price" style="margin-bottom:10px;"><span>Цена по запросу</span></div>
+                                        {% endif %}
+
+                                        <div class="search-tip">
+                                            <p>{% if object.locality and object.locality.road %}{{ object.locality.road.name }} шоссе{% endif %} {% if object.distance %}{{ object.distance }}км{% endif %}</p>
+                                            <p>{% if object.area %}{{ object.area }} cот{% endif %} {% if object.house %}{{ object.house }} м2{% endif %}</p>
+                                        </div>
+                                        {% if to_favorites(object.id) %}
+                                            <a href="{{path('sip_resource_ajax_unfeatured_object')}}"
+                                               id="favorite-list_{{object.id}}" data-item="{{object.id}}"
+                                               data-perform-url="{{path('sip_resource_ajax_featured_object')}}"
+                                               title="{{ 'sip_object_unfeatured_object'|trans }}"
+                                               class="feature-add"
+                                               style="margin-top:0; margin-bottom:0;">
+                                                <i class="fa fa-heart-o fa-2x" id="label-favorite_{{object.id}}" style="color:#FFD800; margin-right:10px; line-height:0; margin-top: 15px;" data-fav-color="rgb(255, 216, 0)" data-infav-color="rgb(0, 0, 0)"></i>
+                                            </a>
+                                        {% else %}
+                                            <a href="{{path('sip_resource_ajax_featured_object')}}"
+                                               id="favorite-list_{{object.id}}" data-item="{{object.id}}"
+                                               data-perform-url="{{path('sip_resource_ajax_unfeatured_object')}}"
+                                               title="{{ 'sip_object_featured_object'|trans }}"
+                                               class="feature-add"
+                                               style="margin-top:0; margin-bottom:0;">
+                                                <i class="fa fa-heart-o fa-2x" id="label-favorite_{{object.id}}" style="color:#000; margin-right:10px; line-height:0; margin-top: 15px;" data-fav-color="rgb(255, 216, 0)" data-infav-color="rgb(0, 0, 0)"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <h1>Вы пока ничего не выбрали</h1>
+                        {% endif %}                    
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

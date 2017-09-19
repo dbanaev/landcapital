@@ -1,0 +1,11 @@
+{% extends "SonataAdminBundle:CRUD:list.html.twig" %}
+    {% block actions %}
+    <li>{% include 'SonataAdminBundle:Button:create_button.html.twig' %}</li>   
+    <li>{% include 'SIPResourceBundle:Admin:currupdate_button.html.twig' %}</li>
+    {% endblock %}         
+    {% block list_filters %}
+        {{ parent() }}
+
+    {{ form_javascript(form) }}
+    {{ form_stylesheet(form) }}
+{% endblock %}

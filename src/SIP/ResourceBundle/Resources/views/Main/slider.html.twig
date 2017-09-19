@@ -1,0 +1,154 @@
+<section id="featured-list" style="opacity: 1;">
+
+    <div class="container">
+
+        <h3>Новинки</h3>
+
+        <div id="tabs" class="full">
+
+
+            <ul class="tabs quicktabs-tabs quicktabs-style-nostyle"> 
+                <li class="grid-feat-ad-style"><a class="current" href="#">Grid View</a></li>
+                <li class="list-feat-ad-style"><a class="" href="#">List View</a></li>
+            </ul>
+
+            <div class="pane" style="display: block;">
+
+                <div id="carousel-buttons">
+                    <a href="#" id="carousel-prev" class="" style="display: block;">← Previous </a>
+                    <a href="#" id="carousel-next" class="" style="display: block;"> Next →</a>
+                </div>
+
+                <div class="caroufredsel_wrapper" style="display: block; text-align: start; float: none; position: relative; top: auto; right: auto; bottom: auto; left: auto; z-index: auto; width: 720px; height: 281px; margin: 0px; overflow: hidden;"><div id="projects-carousel" style="text-align: left; float: none; position: absolute; top: 0px; right: auto; bottom: auto; left: 0px; margin: 0px; width: 10320px; height: 271px; z-index: auto;">
+
+                        {% if lastObjects %}   
+
+                            {% for lastobject in lastObjects %}
+                                <div class="ad-box span3">
+
+                                    <a class="ad-image" href="{{ path('sip_resource_object', {'road': lastobject.locality.road.alias, 'locality': lastobject.locality.alias, 'id':lastobject.id})}}">
+
+                                        <img class="add-box-main-image" src="{% path lastobject.image, 'object_map' %}">
+                                        <img class="add-box-second-image" src="{% path lastobject.secondImage, 'object_map' %}">
+                                    </a>
+
+                                    <div class="ad-box-content">
+
+                                        <span class="ad-category">
+                                            {% if lastobject.dealtype == 'sell' %}
+                                                <div class="category-icon-box" style="background-color: #7ba48a;"><i class="fa {{ get_icon_by_type(lastobject.type) }}"></i></div>
+                                                {% endif %}
+                                                {% if lastobject.dealtype == 'rent' %}
+                                                <div class="category-icon-box" style="background-color: #9c59b6;"><i class="fa {{ get_icon_by_type(lastobject.type) }}"></i></div>
+                                                {% endif %}                                    
+                                        </span>
+
+                                        <a href="{{ path('sip_resource_object', {'road': lastobject.locality.road.alias, 'locality': lastobject.locality.alias, 'id':lastobject.id})}}">{{lastobject.name}}</a>
+
+                                        <div class="search-tip">
+                                            <p>{% if lastobject.locality and lastobject.locality.road %}{{ lastobject.locality.road.name }} ш.,{% endif %} {% if lastobject.distance %}{{ lastobject.distance }}км{% endif %}</p>
+                                            <p>{% if lastobject.area %}{{ lastobject.area }} cот{% endif %} {% if lastobject.house %}• {{ lastobject.house }} м²{% endif %}</p>
+
+                                            {% if lastobject.priceFrom %}
+                                                <div class="add-price" style="margin-top:5px;"><span>{{ lastobject.priceFrom|number_format_duration }} {{ currency(lastobject.currency.code) }}</span></div>
+                                            {% else %}
+                                                <div class="add-price" style="margin-top:5px;"><span>Цена по запросу</span></div>
+                                            {% endif %}
+                                        </div>
+                                        {% if to_favorites(lastobject.id) %}
+                                            <a href="{{path('sip_resource_ajax_unfeatured_object')}}"
+                                               id="favorite-list_{{lastobject.id}}" data-item="{{lastobject.id}}"
+                                               data-perform-url="{{path('sip_resource_ajax_featured_object')}}"
+                                               title="{{ 'sip_object_unfeatured_object'|trans }}"
+                                               class="feature-add"
+                                               style="margin-top:0; margin-bottom:0;">
+                                                <i class="fa fa-heart-o fa-2x" id="label-favorite_{{lastobject.id}}" style="color:#FFD800; margin-right:10px; line-height:0; margin-top: 15px;" data-fav-color="rgb(255, 216, 0)" data-infav-color="rgb(0, 0, 0)"></i>
+                                            </a>
+                                        {% else %}
+                                            <a href="{{path('sip_resource_ajax_featured_object')}}"
+                                               id="favorite-list_{{lastobject.id}}" data-item="{{lastobject.id}}"
+                                               data-perform-url="{{path('sip_resource_ajax_unfeatured_object')}}"
+                                               title="{{ 'sip_object_featured_object'|trans }}"
+                                               class="feature-add"
+                                               style="margin-top:0; margin-bottom:0;">
+                                                <i class="fa fa-heart-o fa-2x" id="label-favorite_{{lastobject.id}}" style="color:#000; margin-right:10px; line-height:0; margin-top: 15px;" data-fav-color="rgb(255, 216, 0)" data-infav-color="rgb(0, 0, 0)"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+
+                                </div>                   
+                            {% endfor %}
+
+                        {% else %}
+                            <p>Последних записей нет</p>
+                        {% endif %}
+                    </div></div>
+
+
+                <script>
+
+                    jQuery(document).ready(function () {
+
+                        jQuery('#projects-carousel').carouFredSel({
+                            auto: false,
+                            prev: '#carousel-prev',
+                            next: '#carousel-next',
+                            pagination: "#carousel-pagination",
+                            mousewheel: true,
+                            swipe: {
+                                onMouse: true,
+                                onTouch: true
+                            }
+                        });
+                        jQuery()
+                    });
+
+                </script>
+                <!-- end scripts -->
+
+            </div>
+
+            <div class="pane" style="display: none;">
+                {% if lastObjects %}
+                    {% for lastobject in lastObjects %}
+                        <div class="list-featured-ads">
+
+                            <div class="list-feat-ad-image">
+
+                                <a class="ad-image" href="{{ path('sip_resource_object', {'road': lastobject.locality.road.alias, 'locality': lastobject.locality.alias, 'id':lastobject.id})}}">
+                                    <img class="add-box-main-image" src="{% path lastobject.image, 'object_map' %}">
+                                    <img class="add-box-second-image" src="{% path lastobject.secondImage, 'object_map' %}">
+                                </a>
+
+                            </div>
+
+                            <div class="list-feat-ad-content">
+
+                                <div class="list-feat-ad-title">
+
+                                    <a href="{{ path('sip_resource_object', {'road': lastobject.locality.road.alias, 'locality': lastobject.locality.alias, 'id':lastobject.id})}}">{{lastobject.name}}</a>
+                                    {% if lastobject.priceFrom %}
+                                        <div class="add-price"><span>{{ lastobject.priceFrom|number_format_duration }}  {{ currency(lastobject.currency.code) }}</span></div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="list-feat-ad-excerpt">
+                                    <p>{{lastobject.title}}</p>
+                                </div>
+
+                                <div class="read-more">	<a href="{{ path('sip_resource_object', {'road': lastobject.locality.road.alias, 'locality': lastobject.locality.alias, 'id':lastobject.id})}}">Подробнее...</a></div>
+
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Последних записей нет</p>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+
+</section>

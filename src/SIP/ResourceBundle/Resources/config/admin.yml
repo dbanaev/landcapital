@@ -1,0 +1,109 @@
+parameters:
+    sip.resourse.setting.admin.class: SIP\ResourceBundle\Admin\SettingAdmin
+    sip.resourse.setting.model.class: SIP\ResourceBundle\Entity\Setting
+
+    sip.resource.objectHasMedia.admin.class: SIP\ResourceBundle\Admin\ObjectHasMediaAdmin
+    sip.resource.objectHasMedia.model.class: SIP\ResourceBundle\Entity\Media\ObjectHasMedia
+
+    sip.resource.object.admin.class: SIP\ResourceBundle\Admin\ObjectAdmin
+    sip.resource.object.model.class: SIP\ResourceBundle\Entity\Object
+
+    sip.resource.bid.admin.class: SIP\ResourceBundle\Admin\BidAdmin
+    sip.resource.bid.model.class: SIP\ResourceBundle\Entity\Bid
+    
+    sip.resourse.mail.subscriber.admin.class: SIP\ResourceBundle\Admin\SubscriberAdmin
+    sip.resourse.mail.subscriber.model.class: SIP\ResourceBundle\Entity\Subscriber
+    
+    sip.resourse.frend.admin.class: SIP\ResourceBundle\Admin\FrendAdmin
+    sip.resourse.frend.model.class: SIP\ResourceBundle\Entity\Frend
+    
+services:
+    sip.resourse.setting.admin:
+        class: %sip.resourse.setting.admin.class%
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: content, label: Setting }
+        arguments: [null, %sip.resourse.setting.model.class%, null, @service_container]
+
+    sonata.media.admin.gallery:
+        class: %sonata.media.admin.gallery.class%
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: sonata_media, label: gallery, show_in_dashboard: false }
+        arguments: [null, %sonata.media.admin.gallery.entity%, %sonata.media.admin.gallery.controller%, @sonata.media.pool]
+        calls:
+            - [setTranslationDomain, [ %sonata.media.admin.gallery.translation_domain% ] ]
+            - [setTemplates, [ {list: SonataMediaBundle:GalleryAdmin:list.html.twig} ] ]
+
+    sip.resourse.setting.admin:
+        class: %sip.resourse.setting.admin.class%
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: content, label: Setting }
+        arguments: [null, %sip.resourse.setting.model.class%, null, @service_container]
+
+    sip.resource.objecthasmedia.admin:
+        class: %sip.resource.objectHasMedia.admin.class%
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: content, label: objectHasMedia, show_in_dashboard: false }
+        arguments: [null, %sip.resource.objectHasMedia.model.class%, SIPCmsBundle:BaseResponse, @service_container]
+
+    sip.resource.object.admin:
+        class: %sip.resource.object.admin.class%
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: content, label: Object }
+#        arguments: [null, %sip.resource.object.model.class%, PixSortableBehaviorBundle:SortableAdmin, @service_container]
+        arguments: [null, %sip.resource.object.model.class%, SIPResourceBundle:CRUD, @service_container]
+
+    sip_resource.admin.road:
+        class: SIP\ResourceBundle\Admin\RoadAdmin
+        arguments: [null, SIP\ResourceBundle\Entity\Lists\Road, null]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: dict, label: Road}
+
+    sip_resource.admin.locality:
+        class: SIP\ResourceBundle\Admin\LocalityAdmin
+        arguments: [null, SIP\ResourceBundle\Entity\Lists\Locality, null]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: dict, label: Locality}
+
+    sip_resource.admin.village:
+        class: SIP\ResourceBundle\Admin\VillageAdmin
+        arguments: [null, SIP\ResourceBundle\Entity\Lists\Village, null]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: dict, label: Village}
+
+    sip_resource.admin.selection:
+        class: SIP\ResourceBundle\Admin\SelectionAdmin
+        arguments: [null, SIP\ResourceBundle\Entity\Lists\Selection, PixSortableBehaviorBundle:SortableAdmin]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: dict, label: Selection}
+
+    sip.resource.admin.currency:
+        class: SIP\ResourceBundle\Admin\CurrencyAdmin
+        arguments: [null, SIP\ResourceBundle\Entity\Lists\Currency, SIPResourceBundle:CurrencyAdmin]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: dict, label: Currency}
+        calls:
+        - [ setTemplate, [list, SIPResourceBundle:Admin:curr_list.html.twig]]
+
+    sip.resourse.meta.admin:
+        class: SIP\ResourceBundle\Admin\MetaDataAdmin
+        arguments: [null, SIP\ResourceBundle\Entity\MetaData, null]
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: dict, label: MetaData }
+
+    sip.resource.bid.admin:
+        class: %sip.resource.bid.admin.class%
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: Заявки, label: Bid}
+        arguments: [null, %sip.resource.bid.model.class%, null]
+        
+    sip.resourse.mail.subscriber.admin:
+        class: %sip.resourse.mail.subscriber.admin.class%
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: Заявки, label: Subscriber }
+        arguments: [null, %sip.resourse.mail.subscriber.model.class%, null, @service_container]    
+    
+    sip.resourse.frend.admin:
+        class: %sip.resourse.frend.admin.class%
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: Заявки, label: Frend }
+        arguments: [null, %sip.resourse.frend.model.class%, null, @service_container]
